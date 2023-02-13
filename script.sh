@@ -118,7 +118,6 @@ echo lz4hc_compress | sudo tee -a /etc/initramfs-tools/modules
 echo z3fold | sudo tee -a /etc/initramfs-tools/modules
 sudo update-initramfs -u
 sudo update-grub
-echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/nobeep.conf
 #### Configuração Firewall
 sudo systemctl enable ufw
 sudo ufw enable
