@@ -1,7 +1,7 @@
 aspell-pt-br
 default-jre
 ffmpeg
-firefox-l10n-pt
+firefox-locale-pt
 fonts-hack
 fonts-ibm-plex
 fonts-jetbrains-mono
@@ -27,7 +27,6 @@ sassc
 unar
 unrar
 unzip
-vlc
 wbrazilian
 wmctrl
 wportuguese
