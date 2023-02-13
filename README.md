@@ -1,8 +1,8 @@
 # lmde-postinstall
-Script de pós instalação do Linux Mint Debian Edition 5 (Elsie), com configurações personalizadas.
+Script de pós instalação do Linux Mint, com configurações personalizadas.
 
 Uso:
-1. Baixar a ISO do LMDE em https://linuxmint.com/download_lmde.php e executar a instalação do S.O.
+1. Baixar a ISO do Linux Mint em https://linuxmint.com/download_lmde.php e executar a instalação do S.O.
 2. No primeiro boot, pressionar as teclas Ctrl + Alt + F2, e fazer login com usuário e senha.
 3. Baixar e executar o script inicial com os comandos:
    ```
