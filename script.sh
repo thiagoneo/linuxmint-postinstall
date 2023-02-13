@@ -108,7 +108,7 @@ sudo chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
 sudo \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
 sudo \cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
-sudo \cp $SCR_DIRECTORY/system-files/etc/grub.d/10_linux /etc/grub.d/10_linux
+sudo \cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
 echo "vm.swappiness=25" | sudo tee -a /etc/sysctl.conf
 echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.conf
 echo "vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
