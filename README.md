@@ -1,4 +1,4 @@
-# lmde-postinstall
+# linuxmint-postinstall
 Script de pós instalação do Linux Mint, com configurações personalizadas.
 
 Uso:
