@@ -25,6 +25,10 @@ SENHA=$(\
 ### Comando original
 echo $SENHA | sudo realm join -U $USUARIO $DOMINIO
 
+if [[ $? == 0 ]]; then
+    dialog --msgbox "Bem-vindo ao domínio $DOMINIO" 10 40
+fi
+
 sudo bash -c "cat > /usr/share/pam-configs/mkhomedir" <<EOF
 Name: activate mkhomedir
 Default: yes
