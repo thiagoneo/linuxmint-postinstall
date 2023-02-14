@@ -43,7 +43,7 @@ sudo systemctl restart sssd
 dialog --erase-on-exit --yesno "Deseja adicionar um grupo deste domínio ao arquivo sudoers?" 8 60
 CONFIGURAR_SUDO=$?
 case $CONFIGURAR_SUDO in
-    0) GRUPO=$(dialog --erase-on-exit --no-cancel --title "Configurar Active Directory" --inputbox "Insira o grupo:" 8 40 3>&1 1>&2 2>&3 3>&-) ; sudo sed -i "/^%sudo.*ALL*/a %$GRUPO$DOMINIO   ALL=(ALL:ALL) ALL" /etc/sudoers ; echo "Grupo $GRUPO adicionado ao arquivo sudoers.";;
+    0) GRUPO=$(dialog --erase-on-exit --no-cancel --title "Configurar Active Directory" --inputbox "Insira o grupo:" 8 40 3>&1 1>&2 2>&3 3>&-) ; sudo sed -i "/^%sudo.*ALL*/a %${GRUPO}@${DOMINIO}   ALL=(ALL:ALL) ALL" /etc/sudoers ; echo "Grupo $GRUPO adicionado ao arquivo sudoers.";;
     1) echo "Você escolheu não adicionar grupo algum ao arquivo sudoers";;
     255) echo "[ESC] key pressed.";;
 esac
