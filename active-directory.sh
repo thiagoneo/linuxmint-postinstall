@@ -25,9 +25,7 @@ SENHA=$(\
 ### Comando original
 echo $SENHA | sudo realm join -U $USUARIO $DOMINIO
 
-if [[ $? == 0 ]]; then
-    dialog --no-cancel --msgbox "Bem-vindo ao domínio $DOMINIO" 8 40
-fi
+STATUS=$?
 
 sudo bash -c "cat > /usr/share/pam-configs/mkhomedir" <<EOF
 Name: activate mkhomedir
@@ -42,8 +40,6 @@ sudo pam-auth-update
 
 sudo systemctl restart sssd
 
-echo "Adicionado ao domínio $DOMINIO com sucesso!"
-
 dialog --erase-on-exit --yesno "Deseja adicionar um grupo do domínio ao arquivo sudoers?" 8 60
 CONFIGURAR_SUDO=$?
 case $CONFIGURAR_SUDO in
@@ -51,3 +47,7 @@ case $CONFIGURAR_SUDO in
     1) echo "Você escolheu não adicionar grupo algum ao arquivo sudoers";;
     255) echo "[ESC] key pressed.";;
 esac
+
+if [[ $STATUS == 0 ]]; then
+    dialog --no-cancel --msgbox "Bem-vindo ao domínio $DOMINIO" 8 40
+fi
