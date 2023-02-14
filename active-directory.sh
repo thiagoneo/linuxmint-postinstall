@@ -16,13 +16,14 @@ USUARIO=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 
-### Comandos TESTE
-#echo "sudo realm join -U $USUARIO $DOMINIO"
-#echo "Senha para $USUARIO: "
-#read -s SENHA
+SENHA=$(\
+    dialog --erase-on-exit --no-cancel --title "Configurar Active Directory"\
+        --insecure --clear --passwordbox "Senha para $USUARIO:" 8 40\
+    3>&1 1>&2 2>&3 3>&- \
+)
 
 ### Comando original
-sudo realm join -U $USUARIO $DOMINIO
+echo $SENHA | sudo realm join -U $USUARIO $DOMINIO
 
 sudo bash -c "cat > /usr/share/pam-configs/mkhomedir" <<EOF
 Name: activate mkhomedir
