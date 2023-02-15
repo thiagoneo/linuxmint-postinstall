@@ -6,7 +6,7 @@ Uso:
 2. No primeiro boot, pressionar as teclas Ctrl + Alt + F2, e fazer login com usuário e senha.
 3. Baixar e executar o script inicial com os comandos:
    ```
-   wget https://raw.githubusercontent.com/thiagoneo/lmde-postinstall/master/start-script.sh
+   wget https://raw.githubusercontent.com/thiagoneo/linuxmint-postinstall/master/start-script.sh
    chmod +x start-script.sh
    ./start-script.sh
    ```
