@@ -9,7 +9,7 @@ SCR_DIRECTORY=`pwd`
 USER_ID=$(echo $UID)
 
 #------------------- ATUALIZAR BASE DE DADOS DO REPOSITÓRIO -------------------#
-sudo apt update
+sudo apt update -y
 
 #------------------------- INSTALAR O PACOTE "dialog" -------------------------#
 sudo apt install -y dialog
@@ -45,6 +45,16 @@ echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
 # esac
 echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt
 echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
+
+
+#---------------------------- OCS-INVENTORY AGENT -----------------------------#
+dialog --erase-on-exit --yesno "Deseja instalar o OCS Inventory Agent?" 8 60
+INSTALL_OCS=$?
+case $INSTALL_OCS in
+    0) sudo apt install -y ocsinventory-agent;;
+    1) echo "Você escolheu não instalar o OCS Inventory Agent.";;
+    255) echo "[ESC] key pressed.";;
+esac
 
 #------------------------------ ACTIVE DIRECTORY ------------------------------#
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um dom Active Directory?" 8 60
