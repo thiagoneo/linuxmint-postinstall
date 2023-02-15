@@ -26,14 +26,14 @@ sudo sed -i "s/$OLD_HOSTNAME/$NEW_HOSTNAME/g" /etc/hosts
 sudo hostnamectl set-hostname $NEW_HOSTNAME
 echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
 
-#--------------------------- DRIVERS DE IMPRESSORA ----------------------------#
-dialog --erase-on-exit --yesno "Deseja instalar os drivers para impressora Brother?" 8 60
-INSTALL_DRIVERS=$?
-case $INSTALL_DRIVERS in
-    0) echo "Os drivers serão instalados";;
-    1) echo "Você escolheu não instalar os drivers" ; rm $SCR_DIRECTORY/packages/hll*.deb $SCR_DIRECTORY/packages/dcp*.deb;;
-    255) echo "[ESC] key pressed.";;
-esac
+# #--------------------------- DRIVERS DE IMPRESSORA ----------------------------#
+# dialog --erase-on-exit --yesno "Deseja instalar os drivers para impressora Brother?" 8 60
+# INSTALL_DRIVERS=$?
+# case $INSTALL_DRIVERS in
+#     0) echo "Os drivers serão instalados";;
+#     1) echo "Você escolheu não instalar os drivers" ; rm $SCR_DIRECTORY/packages/hll*.deb $SCR_DIRECTORY/packages/dcp*.deb;;
+#     255) echo "[ESC] key pressed.";;
+# esac
 
 # #---------------------------- SUPORTE A BLUETOOTH -----------------------------#
 # dialog --erase-on-exit --yesno "Deseja mater o suporte a bluetooth?" 8 60
@@ -43,9 +43,11 @@ esac
 #     1) echo "Você escolheu remover o suporte a bluetooth" ; echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt ; echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt;;
 #     255) echo "[ESC] key pressed.";;
 # esac
+echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt
+echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
 
 #------------------------------ ACTIVE DIRECTORY ------------------------------#
-dialog --erase-on-exit --yesno "Deseja ingressar este computador no Active Directory Domain?" 8 60
+dialog --erase-on-exit --yesno "Deseja ingressar este computador em um dom Active Directory?" 8 60
 JOIN_AD=$?
 function DialogInfo() {
 dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 6 50
