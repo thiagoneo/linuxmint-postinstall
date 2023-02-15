@@ -50,7 +50,7 @@ echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um dom Active Directory?" 8 60
 JOIN_AD=$?
 function DialogInfo() {
-dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 6 50
+dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
 }
 case $JOIN_AD in
     0) DialogInfo ; nmtui-edit ; sudo systemctl restart NetworkManager.service ; bash $SCR_DIRECTORY/active-directory.sh;;
