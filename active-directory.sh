@@ -8,19 +8,19 @@
 # sudo apt -y install dialog
 
 DOMINIO=$(\
-    dialog --erase-on-exit --no-cancel --title "Configurar domínio Active Directory"\
+    dialog --no-cancel --title "Configurar domínio Active Directory"\
         --inputbox "Insira o domínio:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
 
 USUARIO=$(\
-    dialog --erase-on-exit --no-cancel --title "Configurar domínio Active Directory"\
+    dialog --no-cancel --title "Configurar domínio Active Directory"\
         --inputbox "Insira o usuário:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
 
 SENHA=$(\
-    dialog --erase-on-exit --no-cancel --title "Configurar domínio Active Directory"\
+    dialog --no-cancel --title "Configurar domínio Active Directory"\
         --insecure --clear --passwordbox "Senha para $USUARIO:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
@@ -42,13 +42,13 @@ Session:
         required                        pam_mkhomedir.so umask=0022 skel=/etc/skel
 EOF
 
-dialog --erase-on-exit --title "Aviso" --msgbox "Na próxima tela você deverá marcar a opção 'mkhomedir', para as pastas dos usuários sejam criadas ao se fazer login. Caso contrário, não será possível fazer login no ambiente gráfico!" 8 60
+dialog --title "Aviso" --msgbox "Na próxima tela você deverá marcar a opção 'activate mkhomedir', para que as pastas dos usuários sejam criadas automaticamente. Caso contrário, não será possível fazer login no ambiente gráfico!" 9 60
 
 sudo pam-auth-update
 
 sudo systemctl restart sssd
 
-# dialog --erase-on-exit --yesno "Deseja adicionar um grupo deste domínio ao arquivo sudoers?" 8 60
+# dialog --yesno "Deseja adicionar um grupo deste domínio ao arquivo sudoers?" 8 60
 # CONFIGURAR_SUDO=$?
 # case $CONFIGURAR_SUDO in
 #     0) GRUPO=$(dialog --erase-on-exit --no-cancel --title "Configurar domínio Active Directory" --inputbox "Insira o grupo:" 8 45 3>&1 1>&2 2>&3 3>&-) ; sudo sed -i "/^%sudo.*ALL*/a %${GRUPO}@${DOMINIO}   ALL=(ALL:ALL) ALL" /etc/sudoers ; echo "Grupo $GRUPO adicionado ao arquivo sudoers.";;
