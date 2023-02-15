@@ -42,6 +42,8 @@ Session:
         required                        pam_mkhomedir.so umask=0022 skel=/etc/skel
 EOF
 
+dialog --erase-on-exit --title "Aviso" --msgbox "Na próxima tela você deverá marcar a opção 'mkhomedir', para as pastas dos usuários sejam criadas ao se fazer login. Caso contrário, não será possível fazer login no ambiente gráfico!" 8 60
+
 sudo pam-auth-update
 
 sudo systemctl restart sssd
