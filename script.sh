@@ -138,7 +138,7 @@ kill "$infiloop"
 dialog --erase-on-exit --yesno "Chegamos ao fim. É necessário reiniciar o computador para aplicar as alterações. Deseja reiniciar agora?" 8 60
 REBOOT=$?
 case $REBOOT in
-    0) sudo /sbin/reboot;;
-    1) echo "Por favor reiniciar o sistema assim que possível.";;
+    0) systemctl reboot;;
+    1) echo "Por favor reinicie o sistema assim que possível.";;
     255) echo "[ESC] key pressed.";;
 esac
