@@ -128,6 +128,8 @@ sudo ufw enable
 #### Ativar atualizações automáticas
 sudo mintupdate-automation upgrade enable
 sudo mintupdate-automation autoremove enable
+#### Desativar serviço de detecção/instalação automática de impressora
+sudo systemctl disable cups-browsed.service
 #### Desativar driver problemático do CUPS
 sudo mkdir -p /usr/lib/cups/driver/disabled
 sudo mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
