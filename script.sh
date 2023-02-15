@@ -95,10 +95,12 @@ cd $SCR_DIRECTORY
 ls $SCR_DIRECTORY/packages/*.deb > pacotes-locais.txt
 sudo apt install $(cat $SCR_DIRECTORY/pacotes-locais.txt) --no-install-recommends -y
 ### Remover impressoras adicionadas automaticamente
-case $INSTALL_DRIVERS in
-    0) sudo lpadmin -x DCPL5652DN ; sudo lpadmin -x HLL6202DW;;
-    1) echo "Nenhuma impressora instalada";;
-esac
+# case $INSTALL_DRIVERS in
+#     0) sudo lpadmin -x DCPL5652DN ; sudo lpadmin -x HLL6202DW;;
+#     1) echo "Nenhuma impressora instalada";;
+# esac
+sudo lpadmin -x DCPL5652DN
+sudo lpadmin -x HLL6202DW
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 2 ----------------#
 sudo apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
@@ -133,6 +135,10 @@ sudo chown -R $USER_ID:$USER_ID $SCR_DIRECTORY/
 
 #------------------------------------ FIM -------------------------------------#
 kill "$infiloop"
-clear
-echo "Chegamos ao fim."
-echo "Você pode reiniciar agora com o comando '/sbin/reboot'."
+dialog --erase-on-exit --yesno "Chegamos ao fim. É necessário reiniciar o computador para aplicar as alterações. Deseja reiniciar agora?" 8 60
+REBOOT=$?
+case $REBOOT in
+    0) sudo /sbin/reboot;;
+    1) echo "Por favor reiniciar o sistema assim que possível.";;
+    255) echo "[ESC] key pressed.";;
+esac
