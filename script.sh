@@ -57,7 +57,7 @@ case $INSTALL_OCS in
 esac
 
 #------------------------------ ACTIVE DIRECTORY ------------------------------#
-dialog --erase-on-exit --yesno "Deseja ingressar este computador em um dom Active Directory?" 8 60
+dialog --erase-on-exit --yesno "Deseja ingressar este computador em um domínio Active Directory?" 8 60
 JOIN_AD=$?
 function DialogInfo() {
 dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
