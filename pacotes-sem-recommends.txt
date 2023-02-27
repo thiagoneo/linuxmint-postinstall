@@ -7,5 +7,3 @@ fonts-linuxlibertine
 fonts-lobstertwo
 fonts-sil-gentiumplus
 kolourpaint
-lightdm-gtk-greeter
-lightdm-gtk-greeter-settings
