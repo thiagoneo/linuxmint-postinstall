@@ -6,5 +6,4 @@ lightdm-settings
 orca
 pix
 rhythmbox
-slick-greeter
 warpinator
