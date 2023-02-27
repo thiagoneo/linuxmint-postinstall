@@ -62,6 +62,10 @@ JOIN_AD=$?
 function DialogInfo() {
 dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
 }
+##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
+sudo \cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
+sudo rm /etc/resolv.conf
+sudo systemctl restart NetworkManager.service
 case $JOIN_AD in
     0) DialogInfo ; nmtui-edit ; sudo systemctl restart NetworkManager.service ; bash $SCR_DIRECTORY/active-directory.sh;;
     1) echo "Você escolheu não ingressar no Active Directory";;
@@ -122,7 +126,6 @@ sudo chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
 sudo \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
 sudo \cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
-sudo \cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
 echo "vm.swappiness=25" | sudo tee -a /etc/sysctl.conf
 echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.conf
 echo "vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
