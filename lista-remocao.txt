@@ -2,7 +2,6 @@ celluloid
 drawing
 hexchat
 hypnotix
-lightdm-settings
 orca
 pix
 rhythmbox
