@@ -18,8 +18,7 @@ ibrazilian
 libreoffice-help-pt
 libreoffice-help-pt-br
 libreoffice-l10n-pt-br
-lightdm-gtk-greeter
-lightdm-gtk-greeter-settings
+ukui-greeter
 mint-meta-codecs
 numlockx
 p7zip-full
