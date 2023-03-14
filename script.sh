@@ -125,6 +125,7 @@ cd $HOME
 sudo chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
 sudo \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
+sudo \cp -rf $SCR_DIRECTORY/system-files/usr/share/ukui-greeter/ /usr/share/
 sudo \cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
 echo "vm.swappiness=25" | sudo tee -a /etc/sysctl.conf
 echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.conf
