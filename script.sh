@@ -51,7 +51,7 @@ echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
 dialog --erase-on-exit --yesno "Deseja instalar o OCS Inventory Agent?" 8 60
 INSTALL_OCS=$?
 case $INSTALL_OCS in
-    0) sudo apt install -y ocsinventory-agent;;
+    0) sudo apt install -y ocsinventory-agent ; sudo dpkg-reconfigure ocsinventory-agent;;
     1) echo "Você escolheu não instalar o OCS Inventory Agent.";;
     255) echo "[ESC] key pressed.";;
 esac
