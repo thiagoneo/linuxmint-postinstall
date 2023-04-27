@@ -15,7 +15,7 @@ sudo apt update -y
 sudo apt install -y dialog
 
 #--------------------------- ALTERAR SENHA DO ROOT ----------------------------#
-bash $SCR_DIRECTORY/active-directory.sh
+bash $SCR_DIRECTORY/senha-root.sh
 
 #--------------------------- DEFINIR NOVO HOSTNAME ----------------------------#
 OLD_HOSTNAME=`hostname`
