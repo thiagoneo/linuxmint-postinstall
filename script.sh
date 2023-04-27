@@ -124,6 +124,7 @@ sudo apt autoremove --purge -y
 cd $HOME
 sudo chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
+sudo sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
 sudo \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
 sudo \cp -rf $SCR_DIRECTORY/system-files/usr/share/ukui-greeter/ /usr/share/
 sudo \cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
