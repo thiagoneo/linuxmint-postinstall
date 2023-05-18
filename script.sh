@@ -75,6 +75,9 @@ case $JOIN_AD in
     255) echo "[ESC] key pressed.";;
 esac
 
+#--------------------- INSTALAR PACOTE DE FONTES MICROSOFT --------------------#
+sudo apt install -y ttf-mscorefonts-installer
+
 #---------------------------- APLICAR ATUALIZAÇÕES ----------------------------#
 echo ""
 echo "INICIANDO ATUALIZAÇÃO COMPLETA DO SISTEMA..."
