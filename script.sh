@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 
-sudo echo ""
-while :; do sudo -v; sleep 59; done &
-infiloop=$!
+# Verificar se o usuário é o root
+if [[ $EUID -ne 0 ]]; then
+   echo "Este script precisa ser executado como root."
+   exit 1
+fi
 
 #--------------------------------- VARIÁVEIS ----------------------------------#
 SCR_DIRECTORY=`pwd`
-USER_ID=$(echo $UID)
 
 #------------------- ATUALIZAR BASE DE DADOS DO REPOSITÓRIO -------------------#
-sudo apt update -y
+apt update -y
 
 #------------------------- INSTALAR O PACOTE "dialog" -------------------------#
-sudo apt install -y dialog
+apt install -y dialog
 
 #--------------------------- ALTERAR SENHA DO ROOT ----------------------------#
 bash $SCR_DIRECTORY/senha-root.sh
@@ -25,8 +26,8 @@ NEW_HOSTNAME=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 echo ""
-sudo sed -i "s/$OLD_HOSTNAME/$NEW_HOSTNAME/g" /etc/hosts
-sudo hostnamectl set-hostname $NEW_HOSTNAME
+sed -i "s/$OLD_HOSTNAME/$NEW_HOSTNAME/g" /etc/hosts
+hostnamectl set-hostname $NEW_HOSTNAME
 echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
 
 # #--------------------------- DRIVERS DE IMPRESSORA ----------------------------#
@@ -46,15 +47,15 @@ echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
 #     1) echo "Você escolheu remover o suporte a bluetooth" ; echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt ; echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt;;
 #     255) echo "[ESC] key pressed.";;
 # esac
-echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt
-echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
+# echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt
+# echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
 
 
 #---------------------------- OCS-INVENTORY AGENT -----------------------------#
 dialog --erase-on-exit --yesno "Deseja instalar o OCS Inventory Agent?" 8 60
 INSTALL_OCS=$?
 case $INSTALL_OCS in
-    0) sudo apt install -y ocsinventory-agent ; sudo dpkg-reconfigure ocsinventory-agent ; sudo ocsinventory-agent;;
+    0) apt install -y ocsinventory-agent ; dpkg-reconfigure ocsinventory-agent ; ocsinventory-agent;;
     1) echo "Você escolheu não instalar o OCS Inventory Agent.";;
     255) echo "[ESC] key pressed.";;
 esac
@@ -66,36 +67,36 @@ function DialogInfo() {
 dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
 }
 ##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
-sudo \cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
-sudo rm /etc/resolv.conf
-sudo systemctl restart NetworkManager.service
+\cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
+rm /etc/resolv.conf
+systemctl restart NetworkManager.service
 case $JOIN_AD in
-    0) DialogInfo ; nmtui-edit ; sudo systemctl restart NetworkManager.service ; bash $SCR_DIRECTORY/active-directory.sh;;
+    0) DialogInfo ; nmtui-edit ; systemctl restart NetworkManager.service ; bash $SCR_DIRECTORY/active-directory.sh;;
     1) echo "Você escolheu não ingressar no Active Directory";;
     255) echo "[ESC] key pressed.";;
 esac
 
 #--------------------- INSTALAR PACOTE DE FONTES MICROSOFT --------------------#
-sudo apt install -y ttf-mscorefonts-installer
+apt install -y ttf-mscorefonts-installer
 
 #---------------------------- APLICAR ATUALIZAÇÕES ----------------------------#
 echo ""
 echo "INICIANDO ATUALIZAÇÃO COMPLETA DO SISTEMA..."
 echo ""
-sudo mintupdate-cli upgrade -r -y
-sudo mintupdate-cli upgrade -r -y
-sudo apt upgrade -y
+mintupdate-cli upgrade -r -y
+mintupdate-cli upgrade -r -y
+apt upgrade -y
 
 #---------------------- INSTALAR PACOTES DO REPOSITÓRIO -----------------------#
 echo ""
 echo "INSTALANDO PACOTES DO REPOSITÓRIO..."
 echo ""
-sudo apt install $(cat $SCR_DIRECTORY/pacotes-sem-recommends.txt) --no-install-recommends -y
-sudo apt install $(cat $SCR_DIRECTORY/pacotes.txt) -y
+apt install $(cat $SCR_DIRECTORY/pacotes-sem-recommends.txt) --no-install-recommends -y
+apt install $(cat $SCR_DIRECTORY/pacotes.txt) -y
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 1 ----------------#
-sudo apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
-sudo apt autoremove --purge -y
+apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
+apt autoremove --purge -y
 
 #------------------------- INSTALAR PACOTES DO LOCAIS -------------------------#
 echo ""
@@ -107,57 +108,61 @@ if [[ $? == 0 ]]; then
     mv google-chrome-stable_current_amd64.deb $SCR_DIRECTORY/packages/
 fi
 ### RustDesk
-wget -c https://github.com/rustdesk/rustdesk/releases/download/1.1.9/rustdesk-1.1.9.deb
+wget -c https://github.com/rustdesk/rustdesk/releases/download/1.2.0/rustdesk-1.2.0-x86_64.deb -O rustdesk_latest_amd64.deb
 if [[ $? == 0 ]]; then
-    mv rustdesk-1.1.9.deb $SCR_DIRECTORY/packages/
+    mv rustdesk_latest_amd64.deb $SCR_DIRECTORY/packages/
 fi
 cd $SCR_DIRECTORY
 ls $SCR_DIRECTORY/packages/*.deb > pacotes-locais.txt
-sudo apt install $(cat $SCR_DIRECTORY/pacotes-locais.txt) --no-install-recommends -y
+apt install $(cat $SCR_DIRECTORY/pacotes-locais.txt) --no-install-recommends -y
 ### Remover impressoras adicionadas automaticamente
 # case $INSTALL_DRIVERS in
-#     0) sudo lpadmin -x DCPL5652DN ; sudo lpadmin -x HLL6202DW;;
+#     0) lpadmin -x DCPL5652DN ; lpadmin -x HLL6202DW;;
 #     1) echo "Nenhuma impressora instalada";;
 # esac
-sudo lpadmin -x DCPL5652DN
-sudo lpadmin -x HLL6202DW
+lpadmin -x DCPL5652DN
+lpadmin -x HLL6202DW
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 2 ----------------#
-sudo apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
-sudo apt autoremove --purge -y
+apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
+apt autoremove --purge -y
 
 #-------------------- AJUSTES EM CONFIGURAÇÕES DO SISTEMA ---------------------#
 cd $HOME
-sudo chown -R root:root $SCR_DIRECTORY/system-files/
+chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
-sudo sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
-sudo \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
-sudo \cp -rf $SCR_DIRECTORY/system-files/usr/share/ukui-greeter/ /usr/share/
-sudo \cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
-echo "vm.swappiness=25" | sudo tee -a /etc/sysctl.conf
-echo "vm.vfs_cache_pressure=50" | sudo tee -a /etc/sysctl.conf
-echo "vm.dirty_background_ratio=5" | sudo tee -a /etc/sysctl.conf
-echo "vm.dirty_ratio=10" | sudo tee -a /etc/sysctl.conf
-echo lz4hc | sudo tee -a /etc/initramfs-tools/modules
-echo lz4hc_compress | sudo tee -a /etc/initramfs-tools/modules
-echo z3fold | sudo tee -a /etc/initramfs-tools/modules
-sudo update-initramfs -u
-sudo update-grub
+ln -sf /usr/share/icons/Yaru/cursor.theme /etc/alternatives/x-cursor-theme
+
+sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
+\cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
+\cp -rf $SCR_DIRECTORY/system-files/etc/skel/ /etc/
+\cp -rf $SCR_DIRECTORY/system-files/usr/share/ukui-greeter/ /usr/share/
+\cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
+echo "vm.swappiness=25" | tee -a /etc/sysctl.conf
+echo "vm.vfs_cache_pressure=50" | tee -a /etc/sysctl.conf
+echo "vm.dirty_background_ratio=5" | tee -a /etc/sysctl.conf
+echo "vm.dirty_ratio=10" | tee -a /etc/sysctl.conf
+echo lz4hc | tee -a /etc/initramfs-tools/modules
+echo lz4hc_compress | tee -a /etc/initramfs-tools/modules
+echo z3fold | tee -a /etc/initramfs-tools/modules
+update-initramfs -u
+update-grub
 #### Configuração Firewall
-sudo systemctl enable ufw
-sudo ufw enable
+systemctl enable ufw
+ufw enable
 #### Ativar atualizações automáticas
-sudo mintupdate-automation upgrade enable
-sudo mintupdate-automation autoremove enable
+mintupdate-automation upgrade enable
+mintupdate-automation autoremove enable
 #### Desativar serviço de detecção/instalação automática de impressora
-sudo systemctl disable cups-browsed.service
+systemctl disable cups-browsed.service
 #### Desativar driver problemático do CUPS
-sudo mkdir -p /usr/lib/cups/driver/disabled
-sudo mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
-sudo chown -R $USER_ID:$USER_ID $SCR_DIRECTORY/
+mkdir -p /usr/lib/cups/driver/disabled
+mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
+chown -R 1000:1000 $SCR_DIRECTORY/
+chmod -R 777 $SCR_DIRECTORY/
 
 #------------------------------------ FIM -------------------------------------#
-kill "$infiloop"
+
 dialog --erase-on-exit --yesno "Chegamos ao fim. É necessário reiniciar o computador para aplicar as alterações. Deseja reiniciar agora?" 8 60
 REBOOT=$?
 case $REBOOT in

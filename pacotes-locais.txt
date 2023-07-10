@@ -1,0 +1,6 @@
+/home/administrador/linuxmint-postinstall-master/packages/dcpl5652dncupswrapper-3.5.1-1.i386.deb
+/home/administrador/linuxmint-postinstall-master/packages/dcpl5652dnlpr-3.5.1-1.i386.deb
+/home/administrador/linuxmint-postinstall-master/packages/google-chrome-stable_current_amd64.deb
+/home/administrador/linuxmint-postinstall-master/packages/hll6202dwcupswrapper-3.5.1-1.i386.deb
+/home/administrador/linuxmint-postinstall-master/packages/hll6202dwlpr-3.5.1-1.i386.deb
+/home/administrador/linuxmint-postinstall-master/packages/rustdesk-1.1.9.deb

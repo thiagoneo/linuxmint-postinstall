@@ -1,3 +1,4 @@
+breeze-cursor-theme
 breeze-icon-theme
 fonts-comfortaa
 fonts-croscore

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Verificar se o usuário é o root
+if [[ $EUID -ne 0 ]]; then
+   echo "Este script precisa ser executado como root."
+   exit 1
+fi
+
 ALT=1
 while [ $ALT = 1 ]
 do
@@ -20,7 +26,7 @@ do
             --msgbox "As senhas não são iguais. Tente novamente." 6 45
     fi
 done
-echo "root:$SENHA_ROOT" | sudo chpasswd
+echo "root:$SENHA_ROOT" | chpasswd
 if [ $? = 0 ]; then
     dialog --no-cancel --title "Definir senha do root"\
             --msgbox "Senha alterada com sucesso!" 6 40

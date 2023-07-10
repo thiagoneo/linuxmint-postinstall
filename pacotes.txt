@@ -1,6 +1,4 @@
 aspell-pt-br
-default-jre
-ffmpeg
 firefox-locale-pt
 fonts-hack
 fonts-ibm-plex
@@ -19,7 +17,6 @@ libreoffice-help-pt
 libreoffice-help-pt-br
 libreoffice-l10n-pt-br
 ukui-greeter
-mint-meta-codecs
 numlockx
 p7zip-full
 python3-dev
