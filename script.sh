@@ -108,7 +108,7 @@ if [[ $? == 0 ]]; then
     mv google-chrome-stable_current_amd64.deb $SCR_DIRECTORY/packages/
 fi
 ### RustDesk
-wget -c https://github.com/rustdesk/rustdesk/releases/download/1.2.0/rustdesk-1.2.0-x86_64.deb -O rustdesk_latest_amd64.deb
+wget -c https://github.com/rustdesk/rustdesk/releases/download/1.2.2/rustdesk-1.2.2-x86_64.deb
 if [[ $? == 0 ]]; then
     mv rustdesk_latest_amd64.deb $SCR_DIRECTORY/packages/
 fi
@@ -131,7 +131,6 @@ apt autoremove --purge -y
 cd $HOME
 chown -R root:root $SCR_DIRECTORY/system-files/
 cd $SCR_DIRECTORY/
-ln -sf /usr/share/icons/Yaru/cursor.theme /etc/alternatives/x-cursor-theme
 
 sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
 \cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
