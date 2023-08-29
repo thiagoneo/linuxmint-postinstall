@@ -6,5 +6,8 @@ lightdm-settings
 orca
 pix
 rhythmbox
+simple-scan
 slick-greeter
+transmission-common
+transmission-gtk
 warpinator
