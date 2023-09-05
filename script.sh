@@ -110,7 +110,7 @@ fi
 ### RustDesk
 wget -c https://github.com/rustdesk/rustdesk/releases/download/1.2.2/rustdesk-1.2.2-x86_64.deb
 if [[ $? == 0 ]]; then
-    mv rustdesk_latest_amd64.deb $SCR_DIRECTORY/packages/
+    mv rustdesk-1.2.2-x86_64.deb $SCR_DIRECTORY/packages/
 fi
 cd $SCR_DIRECTORY
 ls $SCR_DIRECTORY/packages/*.deb > pacotes-locais.txt
