@@ -64,7 +64,7 @@ esac
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um domínio Active Directory?" 8 60
 JOIN_AD=$?
 function DialogInfo() {
-dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
+dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima etapa, insira o servidor DNS para resolver o domínio. Normalmente, o IP do servidor DNS é o mesmo do Controlador de Domínio, a menos que sejam servidores separados.' 8 60
 }
 ##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/NetworkManager/ /etc/
