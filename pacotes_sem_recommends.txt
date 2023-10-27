@@ -1,10 +1,6 @@
 breeze-cursor-theme
 breeze-icon-theme
-fonts-comfortaa
 fonts-croscore
 fonts-crosextra-caladea
 fonts-crosextra-carlito
 fonts-linuxlibertine
-fonts-lobstertwo
-fonts-sil-gentiumplus
-kolourpaint

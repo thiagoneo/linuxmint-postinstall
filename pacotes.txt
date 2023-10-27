@@ -1,8 +1,6 @@
 aspell-pt-br
 firefox-locale-pt
-fonts-hack
 fonts-ibm-plex
-fonts-jetbrains-mono
 fonts-liberation2
 fonts-noto-cjk
 fonts-noto-core

@@ -16,7 +16,7 @@ apt update -y
 apt install -y dialog
 
 #--------------------------- ALTERAR SENHA DO ROOT ----------------------------#
-bash $SCR_DIRECTORY/senha-root.sh
+bash "${SCR_DIRECTORY}"/senha_root.sh
 
 #--------------------------- DEFINIR NOVO HOSTNAME ----------------------------#
 OLD_HOSTNAME=`hostname`
@@ -26,16 +26,16 @@ NEW_HOSTNAME=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 echo ""
-sed -i "s/$OLD_HOSTNAME/$NEW_HOSTNAME/g" /etc/hosts
-hostnamectl set-hostname $NEW_HOSTNAME
-echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
+sed -i "s/${OLD_HOSTNAME}/${NEW_HOSTNAME}/g" /etc/hosts
+hostnamectl set-hostname ${NEW_HOSTNAME}
+echo "Novo HOSTNAME definido como ${NEW_HOSTNAME}"
 
 # #--------------------------- DRIVERS DE IMPRESSORA ----------------------------#
 # dialog --erase-on-exit --yesno "Deseja instalar os drivers para impressora Brother?" 8 60
 # INSTALL_DRIVERS=$?
 # case $INSTALL_DRIVERS in
 #     0) echo "Os drivers serão instalados";;
-#     1) echo "Você escolheu não instalar os drivers" ; rm $SCR_DIRECTORY/packages/hll*.deb $SCR_DIRECTORY/packages/dcp*.deb;;
+#     1) echo "Você escolheu não instalar os drivers" ; rm "${SCR_DIRECTORY}"/packages/hll*.deb "${SCR_DIRECTORY}"/packages/dcp*.deb;;
 #     255) echo "[ESC] key pressed.";;
 # esac
 
@@ -44,11 +44,11 @@ echo "Novo HOSTNAME definido como $NEW_HOSTNAME"
 # BLUETOOTH=$?
 # case $BLUETOOTH in
 #     0) echo "O suporte a bluetooth será mantido";;
-#     1) echo "Você escolheu remover o suporte a bluetooth" ; echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt ; echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt;;
+#     1) echo "Você escolheu remover o suporte a bluetooth" ; echo "bluetooth" >> "${SCR_DIRECTORY}"/pacotes_remover.txt ; echo "bluez" >> "${SCR_DIRECTORY}"/pacotes_remover.txt;;
 #     255) echo "[ESC] key pressed.";;
 # esac
-# echo "bluetooth" >> $SCR_DIRECTORY/lista-remocao.txt
-# echo "bluez" >> $SCR_DIRECTORY/lista-remocao.txt
+# echo "bluetooth" >> "${SCR_DIRECTORY}"/pacotes_remover.txt
+# echo "bluez" >> "${SCR_DIRECTORY}"/pacotes_remover.txt
 
 
 #---------------------------- OCS-INVENTORY AGENT -----------------------------#
@@ -67,11 +67,11 @@ function DialogInfo() {
 dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima tela você deverá alterar o servidor DNS de modo a conseguir resolver o domínio' 8 60
 }
 ##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
-\cp -rf $SCR_DIRECTORY/system-files/etc/NetworkManager/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/NetworkManager/ /etc/
 rm /etc/resolv.conf
 systemctl restart NetworkManager.service
 case $JOIN_AD in
-    0) DialogInfo ; nmtui-edit ; systemctl restart NetworkManager.service ; bash $SCR_DIRECTORY/active-directory.sh;;
+    0) DialogInfo ; bash "${SCR_DIRECTORY}"/dns.sh ; bash "${SCR_DIRECTORY}"/active_directory.sh;;
     1) echo "Você escolheu não ingressar no Active Directory";;
     255) echo "[ESC] key pressed.";;
 esac
@@ -91,30 +91,19 @@ apt upgrade -y
 echo ""
 echo "INSTALANDO PACOTES DO REPOSITÓRIO..."
 echo ""
-apt install $(cat $SCR_DIRECTORY/pacotes-sem-recommends.txt) --no-install-recommends -y
-apt install $(cat $SCR_DIRECTORY/pacotes.txt) -y
+apt install $(cat "${SCR_DIRECTORY}"/pacotes_sem_recommends.txt) --no-install-recommends -y
+apt install $(cat "${SCR_DIRECTORY}"/pacotes.txt) -y
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 1 ----------------#
-apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
+apt purge $(cat "${SCR_DIRECTORY}"/pacotes_remover.txt) -y
 apt autoremove --purge -y
 
 #------------------------- INSTALAR PACOTES DO LOCAIS -------------------------#
 echo ""
 echo "INSTALANDO PACOTES DO LOCAIS..."
-cd /tmp
-### Google Chrome
-wget -c https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-if [[ $? == 0 ]]; then
-    mv google-chrome-stable_current_amd64.deb $SCR_DIRECTORY/packages/
-fi
-### RustDesk
-wget -c https://github.com/rustdesk/rustdesk/releases/download/1.2.2/rustdesk-1.2.2-x86_64.deb
-if [[ $? == 0 ]]; then
-    mv rustdesk-1.2.2-x86_64.deb $SCR_DIRECTORY/packages/
-fi
-cd $SCR_DIRECTORY
-ls $SCR_DIRECTORY/packages/*.deb > pacotes-locais.txt
-apt install $(cat $SCR_DIRECTORY/pacotes-locais.txt) --no-install-recommends -y
+cd "${SCR_DIRECTORY}"
+grep -v '^#' pacotes_baixar.txt | wget -i - -P pacotes
+apt install "${SCR_DIRECTORY}"/pacotes/*.deb --no-install-recommends -y
 ### Remover impressoras adicionadas automaticamente
 # case $INSTALL_DRIVERS in
 #     0) lpadmin -x DCPL5652DN ; lpadmin -x HLL6202DW;;
@@ -122,21 +111,22 @@ apt install $(cat $SCR_DIRECTORY/pacotes-locais.txt) --no-install-recommends -y
 # esac
 lpadmin -x DCPL5652DN
 lpadmin -x HLL6202DW
+lpadmin -x HLL6402DW
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 2 ----------------#
-apt purge $(cat $SCR_DIRECTORY/lista-remocao.txt) -y
+apt purge $(cat "${SCR_DIRECTORY}"/pacotes_remover.txt) -y
 apt autoremove --purge -y
 
 #-------------------- AJUSTES EM CONFIGURAÇÕES DO SISTEMA ---------------------#
 cd $HOME
-chown -R root:root $SCR_DIRECTORY/system-files/
-cd $SCR_DIRECTORY/
+chown -R root:root "${SCR_DIRECTORY}"/system-files/
+cd "${SCR_DIRECTORY}"/
 
 sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
-\cp -rf $SCR_DIRECTORY/system-files/etc/lightdm/ /etc/
-\cp -rf $SCR_DIRECTORY/system-files/etc/skel/ /etc/
-\cp -rf $SCR_DIRECTORY/system-files/usr/share/ukui-greeter/ /usr/share/
-\cp $SCR_DIRECTORY/system-files/etc/default/grub /etc/default/grub
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/lightdm/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/skel/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/usr/share/ukui-greeter/ /usr/share/
+\cp "${SCR_DIRECTORY}"/system-files/etc/default/grub /etc/default/grub
 echo "vm.swappiness=25" | tee -a /etc/sysctl.conf
 echo "vm.vfs_cache_pressure=50" | tee -a /etc/sysctl.conf
 echo "vm.dirty_background_ratio=5" | tee -a /etc/sysctl.conf
@@ -157,8 +147,8 @@ systemctl disable cups-browsed.service
 #### Desativar driver problemático do CUPS
 mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
-chown -R 1000:1000 $SCR_DIRECTORY/
-chmod -R 777 $SCR_DIRECTORY/
+chown -R 1000:1000 "${SCR_DIRECTORY}"/
+chmod -R 777 "${SCR_DIRECTORY}"/
 
 #------------------------------------ FIM -------------------------------------#
 

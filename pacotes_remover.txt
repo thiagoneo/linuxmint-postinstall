@@ -3,6 +3,10 @@ drawing
 hexchat
 hypnotix
 lightdm-settings
+mint-l-icons
+mint-l-theme
+numix-icon-theme
+numix-icon-theme-circle
 orca
 pix
 rhythmbox
