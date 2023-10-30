@@ -53,6 +53,7 @@ case $JOIN_AD in
 esac
 
 #--------------------- INSTALAR PACOTE DE FONTES MICROSOFT --------------------#
+echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
 apt install -y ttf-mscorefonts-installer
 
 #---------------------------- APLICAR ATUALIZAÇÕES ----------------------------#
