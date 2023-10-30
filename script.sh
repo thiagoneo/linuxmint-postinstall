@@ -30,27 +30,6 @@ sed -i "s/${OLD_HOSTNAME}/${NEW_HOSTNAME}/g" /etc/hosts
 hostnamectl set-hostname ${NEW_HOSTNAME}
 echo "Novo HOSTNAME definido como ${NEW_HOSTNAME}"
 
-# #--------------------------- DRIVERS DE IMPRESSORA ----------------------------#
-# dialog --erase-on-exit --yesno "Deseja instalar os drivers para impressora Brother?" 8 60
-# INSTALL_DRIVERS=$?
-# case $INSTALL_DRIVERS in
-#     0) echo "Os drivers serão instalados";;
-#     1) echo "Você escolheu não instalar os drivers" ; rm "${SCR_DIRECTORY}"/packages/hll*.deb "${SCR_DIRECTORY}"/packages/dcp*.deb;;
-#     255) echo "[ESC] key pressed.";;
-# esac
-
-# #---------------------------- SUPORTE A BLUETOOTH -----------------------------#
-# dialog --erase-on-exit --yesno "Deseja mater o suporte a bluetooth?" 8 60
-# BLUETOOTH=$?
-# case $BLUETOOTH in
-#     0) echo "O suporte a bluetooth será mantido";;
-#     1) echo "Você escolheu remover o suporte a bluetooth" ; echo "bluetooth" >> "${SCR_DIRECTORY}"/pacotes_remover.txt ; echo "bluez" >> "${SCR_DIRECTORY}"/pacotes_remover.txt;;
-#     255) echo "[ESC] key pressed.";;
-# esac
-# echo "bluetooth" >> "${SCR_DIRECTORY}"/pacotes_remover.txt
-# echo "bluez" >> "${SCR_DIRECTORY}"/pacotes_remover.txt
-
-
 #---------------------------- OCS-INVENTORY AGENT -----------------------------#
 dialog --erase-on-exit --yesno "Deseja instalar o OCS Inventory Agent?" 8 60
 INSTALL_OCS=$?
@@ -63,15 +42,12 @@ esac
 #------------------------------ ACTIVE DIRECTORY ------------------------------#
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um domínio Active Directory?" 8 60
 JOIN_AD=$?
-function DialogInfo() {
-dialog --erase-on-exit --title "Aviso" --msgbox 'Na próxima etapa, insira o servidor DNS para resolver o domínio. Normalmente, o IP do servidor DNS é o mesmo do Controlador de Domínio, a menos que sejam servidores separados.' 8 60
-}
 ##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/NetworkManager/ /etc/
 rm /etc/resolv.conf
 systemctl restart NetworkManager.service
 case $JOIN_AD in
-    0) DialogInfo ; bash "${SCR_DIRECTORY}"/dns.sh ; bash "${SCR_DIRECTORY}"/active_directory.sh;;
+    0) bash "${SCR_DIRECTORY}"/active_directory.sh;;
     1) echo "Você escolheu não ingressar no Active Directory";;
     255) echo "[ESC] key pressed.";;
 esac
