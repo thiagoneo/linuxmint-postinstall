@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# Script para automatizar o processo de ingressar um computador
+# rodando Linux (Debian, Ubuntu e derivados) em um domínio
+# Active Directory
+
 # Verificar se o usuário é o root
 if [[ $EUID -ne 0 ]]; then
    echo "Este script precisa ser executado como root."
@@ -45,19 +49,19 @@ dialog_info
 altera_dns
 
 DOMINIO=$(\
-    dialog --no-cancel --title "Configurar domínio Active Directory"\
+    dialog --no-cancel --title "Ingresso em domínio Active Directory"\
         --inputbox "Insira o domínio:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
 
 USUARIO=$(\
-    dialog --no-cancel --title "Configurar domínio Active Directory"\
-        --inputbox "Insira o usuário:" 8 45\
+    dialog --no-cancel --title "Ingresso em domínio Active Directory"\
+        --inputbox "Insira um nome de usuário com permissão para ingressar em ${DOMINIO}:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
 
 SENHA=$(\
-    dialog --no-cancel --title "Configurar domínio Active Directory"\
+    dialog --no-cancel --title "Ingresso em domínio Active Directory"\
         --insecure --clear --passwordbox "Senha para $USUARIO:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
@@ -66,7 +70,7 @@ apt -y update
 apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
 
 ### Comando original
-echo $SENHA | realm join -U $USUARIO $DOMINIO
+echo $SENHA | realm join -U ${USUARIO} ${DOMINIO}
 
 STATUS=$?
 
@@ -75,18 +79,10 @@ if ! grep -q "session.*required.*pam_mkhomedir.so.*umask.*" /etc/pam.d/common-se
     echo 'session required                        pam_mkhomedir.so umask=0027 skel=/etc/skel' >> /etc/pam.d/common-session
 fi
 
-# Permitir fazer login sem a necessidade de acrescentar o "@dominio" ao nome de usuário:
+# Permitir fazer login sem a necessidade de acrescentar o sufixo "@dominio" ao nome de usuário:
 sed -i "s/use_fully_qualified_names = True/use_fully_qualified_names = False/g" /etc/sssd/sssd.conf
 
 systemctl restart sssd
-
-# dialog --yesno "Deseja adicionar um grupo deste domínio ao arquivo sudoers?" 8 60
-# CONFIGURAR_SUDO=$?
-# case $CONFIGURAR_SUDO in
-#     0) GRUPO=$(dialog --erase-on-exit --no-cancel --title "Configurar domínio Active Directory" --inputbox "Insira o grupo:" 8 45 3>&1 1>&2 2>&3 3>&-) ; sed -i "/^%sudo.*ALL*/a %${GRUPO}@${DOMINIO}   ALL=(ALL:ALL) ALL" /etc/sudoers ; echo "Grupo $GRUPO adicionado ao arquivo sudoers.";;
-#     1) echo "Você escolheu não adicionar grupo algum ao arquivo sudoers";;
-#     255) echo "[ESC] key pressed.";;
-# esac
 
 if [[ $STATUS == 0 ]]; then
     dialog --no-cancel --msgbox "Bem-vindo ao domínio ${DOMINIO}!" 8 45
