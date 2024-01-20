@@ -3,6 +3,7 @@
 ##########################################
 # Script de Pós-instalação do Linux Mint #
 # Autor: Thiago de S. Ferreira           #
+# E-mail: sousathiago@protonmail.com     #
 ##########################################
 
 # Verificar se o usuário é o root
