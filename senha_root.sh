@@ -3,6 +3,7 @@
 ##################################################
 # Script para alteração de senha do usuário root #
 # Autor: Thiago de S. Ferreira                   #
+# E-mail: sousathiago@protonmail.com             #
 ##################################################
 
 # Verificar se o usuário é o root
