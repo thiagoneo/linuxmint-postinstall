@@ -24,6 +24,7 @@ Este script visa simplificar e aprimorar a integração do Linux Mint em ambient
 
 Este script não apenas otimiza a experiência do usuário, mas também simplifica a implantação e integração de sistemas Linux em ambientes predominantemente Windows. A integração com o Active Directory e outras ferramentas corporativas contribui para a coexistência harmoniosa entre sistemas operacionais, enquanto a interface intuitiva do Linux Mint proporciona uma transição fácil para usuários familiarizados com ambientes Windows.
 
+---
 
 **Instruções de uso:**
 
