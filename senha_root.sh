@@ -1,5 +1,10 @@
 #!/bin/bash
 
+##################################################
+# Script para alteração de senha do usuário root #
+# Autor: Thiago de S. Ferreira                   #
+##################################################
+
 # Verificar se o usuário é o root
 if [[ $EUID -ne 0 ]]; then
    echo "Este script precisa ser executado como root."
