@@ -2,6 +2,7 @@ celluloid
 drawing
 hexchat
 hypnotix
+libreoffice-style-breeze
 lightdm-settings
 mint-l-icons
 mint-l-theme
