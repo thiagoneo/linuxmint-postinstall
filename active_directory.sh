@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-# Script para automatizar o processo de ingressar um computador
-# rodando Linux (Debian, Ubuntu e derivados) em um domínio
-# Active Directory
+##################################################################
+# Script para automatizar o processo de ingressar um computador  #
+# rodando Linux (Debian, Ubuntu e derivados) no Active Directory #
+# Autor: Thiago de S. Ferreira                                   #
+##################################################################
 
 # Verificar se o usuário é o root
 if [[ $EUID -ne 0 ]]; then
