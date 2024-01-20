@@ -4,6 +4,7 @@
 # Script para automatizar o processo de ingressar um computador  #
 # rodando Linux (Debian, Ubuntu e derivados) no Active Directory #
 # Autor: Thiago de S. Ferreira                                   #
+# E-mail: sousathiago@protonmail.com                             #
 ##################################################################
 
 # Verificar se o usuário é o root
