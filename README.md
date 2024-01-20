@@ -32,7 +32,7 @@ Este script não apenas otimiza a experiência do usuário, mas também simplifi
 3. Faça login na interface de terminal do Linux (pressione as teclas Ctrl + Alt + F2), navegue até a pasta com os arquivos extraídos e execute estes comandos:
    ```
    chmod +x *.sh
-   ./script.sh
+   sudo ./script.sh
    ```
    Obs.: Também é possível abrir um terminal dentro do ambiente gráfico e executar o script. No entanto, isso pode apresentar problemas, como interrupções durante a atualização do sistema, que poderiam encerrar inesperadamente o ambiente gráfico e interromper a execução do script (isso implica também que deve-se salvar todos os trabalhos e fechar os programas antes da execução do script). Portanto, o mais seguro e recomendado é executar o script em um console (TTY) separado.
 4. Após o término da execução, reinicie o sistema.
