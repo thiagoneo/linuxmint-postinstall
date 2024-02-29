@@ -13,11 +13,9 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# Testa se o pacote dialog está instalado, e instala-o caso não esteja
-if ! dpkg -s dialog >/dev/null 2>&1; then
-    echo "O pacote 'dialog' não está instalado. Instalando o pacote..."
-    apt update
-    apt install -y dialog
+# Instalar o pacote dialog, se não for encontrado no sistema
+if ! command -v dialog &> /dev/null; then
+    sudo apt -y install dialog
 fi
 
 altera_dns() {
