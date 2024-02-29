@@ -12,6 +12,11 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# Instalar o pacote dialog, se não for encontrado no sistema
+if ! command -v dialog &> /dev/null; then
+    sudo apt -y install dialog
+fi
+
 ALT=1
 while [ $ALT = 1 ]
 do
