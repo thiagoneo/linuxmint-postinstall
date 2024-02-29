@@ -19,7 +19,10 @@ SCR_DIRECTORY=`pwd`
 apt update -y
 
 #------------------------- INSTALAR O PACOTE "dialog" -------------------------#
-apt install -y dialog
+# Instalar o pacote dialog, se não for encontrado no sistema
+if ! command -v dialog &> /dev/null; then
+    sudo apt -y install dialog
+fi
 
 #--------------------------- ALTERAR SENHA DO ROOT ----------------------------#
 bash "${SCR_DIRECTORY}"/senha_root.sh
