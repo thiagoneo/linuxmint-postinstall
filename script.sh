@@ -133,6 +133,11 @@ systemctl disable cups-browsed.service
 #### Desativar driver problemático do CUPS
 mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
+### Antivirus
+systemctl stop clamav-freshclam
+freshclam
+systemctl enable --now clamav-freshclam
+systemctl enable --now clamav-daemon
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 
