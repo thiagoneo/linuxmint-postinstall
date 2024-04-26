@@ -1,4 +1,8 @@
 aspell-pt-br
+clamav
+clamav-daemon
+clamtk
+clamtk-gnome
 firefox-locale-pt
 fonts-ibm-plex
 fonts-liberation2
