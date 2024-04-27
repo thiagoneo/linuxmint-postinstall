@@ -18,6 +18,7 @@ ibrazilian
 libreoffice-help-pt
 libreoffice-help-pt-br
 libreoffice-l10n-pt-br
+libreoffice-style-colibre
 ukui-greeter
 numlockx
 p7zip-full
