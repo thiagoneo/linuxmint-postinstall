@@ -112,6 +112,7 @@ sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/lightdm/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/skel/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/dconf/ /etc/
+dconf update
 \cp -rf "${SCR_DIRECTORY}"/system-files/usr/share/ukui-greeter/ /usr/share/
 \cp "${SCR_DIRECTORY}"/system-files/etc/default/grub /etc/default/grub
 echo "vm.swappiness=25" | tee -a /etc/sysctl.conf
