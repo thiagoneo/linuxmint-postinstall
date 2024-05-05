@@ -1,3 +1,6 @@
+avahi-autoipd
+avahi-daemon
+avahi-utils
 celluloid
 drawing
 hexchat
