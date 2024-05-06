@@ -10,7 +10,7 @@ Este script visa simplificar e aprimorar a integração do Linux Mint em ambient
 
 - **Otimização de Performance:** Realiza ajustes para otimizar o desempenho do sistema operacional, visando proporcionar uma experiência mais ágil e responsiva.
 
-- **Segurança Aprimorada:** Os sistemas Linux são, por natureza, mais seguros e resistentes a ameaças. Para aprimorar ainda mais essa segurança, o script ativa e configura o firewall, fortalecendo a proteção do sistema operacional.
+- **Segurança Aprimorada:** Os sistemas Linux são, por natureza, mais seguros e resistentes a ameaças. Para aprimorar ainda mais essa segurança, o script ativa e configura o firewall, fortalecendo a proteção do sistema operacional. Além disso, agora o antivírus de código aberto ClamAV é instalado, juntamente com o ClamTK, uma ferramenta gráfica para escanear arquivos e eliminar possíveis arquivos maliciosos, protegendo o sistema em questão, bem como outros dispositivos na rede, especialmente sistemas Windows, que podem ser alvo desses malwares por meio de compartilhamento de arquivos.
 
 - **Atualizações Automáticas e Transparentes:** Ativa as atualizações automáticas do sistema, eliminando a preocupação e a necessidade de aplicar atualizações manualmente. O Linux Mint realiza as atualizações em segundo plano, permitindo que o usuário utilize o computador enquanto o sistema executa essas tarefas. O sistema nunca será reiniciado de forma inesperada, e o usuário tem total controle para reiniciar quando for conveniente. Isso garante um sistema que se auto-mantém seguro e atualizado.
 
