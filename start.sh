@@ -130,11 +130,12 @@ chmod 755 /etc/dconf/db/local.d/
 dconf update
 
 # Instalação de certificados CA local
-\cp -rf "${SCR_DIRECTORY}"/system-files/system-files/usr/local/share/ca-certificates/* /usr/local/share/ca-certificates/
+rm -f "${SCR_DIRECTORY}"/system-files/usr/local/share/ca-certificates/empty
+\cp -rf "${SCR_DIRECTORY}"/system-files/usr/local/share/ca-certificates/* /usr/local/share/ca-certificates/
 update-ca-certificates
 
 # Configurar navegadores para utilizar repositório de certificados CA do sistema
-\cp -rf "${SCR_DIRECTORY}"/system-files/system-files/usr/local/bin/fix-browsers-ca-trust.sh /usr/local/bin
+\cp -rf "${SCR_DIRECTORY}"/system-files/usr/local/bin/fix-browsers-ca-trust.sh /usr/local/bin
 chmod +x /usr/local/bin/fix-browsers-ca-trust.sh
 /usr/local/bin/fix-browsers-ca-trust.sh
 
