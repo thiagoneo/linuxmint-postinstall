@@ -90,11 +90,8 @@ echo "INSTALANDO PACOTES DO LOCAIS..."
 cd "${SCR_DIRECTORY}"
 grep -v '^#' pacotes_baixar.txt | wget -i - -P pacotes
 apt install "${SCR_DIRECTORY}"/pacotes/*.deb --no-install-recommends -y
-### Remover impressoras adicionadas automaticamente
-# case $INSTALL_DRIVERS in
-#     0) lpadmin -x DCPL5652DN ; lpadmin -x HLL6202DW;;
-#     1) echo "Nenhuma impressora instalada";;
-# esac
+
+# Remover impressoras adicionadas automaticamente
 lpadmin -x DCPL5652DN
 lpadmin -x HLL6202DW
 lpadmin -x HLL6402DW
@@ -104,24 +101,44 @@ apt purge $(cat "${SCR_DIRECTORY}"/pacotes_remover.txt) -y
 apt autoremove --purge -y
 
 #-------------------- AJUSTES EM CONFIGURAÇÕES DO SISTEMA ---------------------#
+# Copia de arquivos de configuração diversos para o sistema
+
 cd $HOME
 chown -R root:root "${SCR_DIRECTORY}"/system-files/
 cd "${SCR_DIRECTORY}"/
 
+# Configuração para exibir todos os aplicativos de inicialização
 sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
+
+# Configuração do gerenciador de telas LightDM (tela de login)
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/lightdm/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/usr/share/ukui-greeter/ /usr/share/
+
+# Configuração de políticas de navegadores Firefox e Google Chrome
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/firefox/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/opt/ /etc/
-\cp -rf "${SCR_DIRECTORY}"/system-files/etc/skel/ /etc/
-\cp -rf "${SCR_DIRECTORY}"/system-files/etc/dconf/ /etc/
 chmod -R 755 /etc/firefox/
 chmod 644 /etc/firefox/policies/policies.json
 chmod -R 755 /etc/opt/
 chmod 644 /etc/opt/chrome/policies/*/*.json
+
+# Configurações padrão dos usuários
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/skel/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/dconf/ /etc/
 chmod 755 /etc/dconf/profile/
 chmod 755 /etc/dconf/db/local.d/
 dconf update
-\cp -rf "${SCR_DIRECTORY}"/system-files/usr/share/ukui-greeter/ /usr/share/
+
+# Instalação de certificados CA local
+\cp -rf "${SCR_DIRECTORY}"/system-files/system-files/usr/local/share/ca-certificates/* /usr/local/share/ca-certificates/
+update-ca-certificates
+
+# Configurar navegadores para utilizar repositório de certificados CA do sistema
+\cp -rf "${SCR_DIRECTORY}"/system-files/system-files/usr/local/bin/fix-browsers-ca-trust.sh /usr/local/bin
+chmod +x /usr/local/bin/fix-browsers-ca-trust.sh
+/usr/local/bin/fix-browsers-ca-trust.sh
+
+# Ativar ZSWAP e configurar parâmetros de swap e cache
 \cp "${SCR_DIRECTORY}"/system-files/etc/default/grub /etc/default/grub
 echo "vm.swappiness=25" | tee -a /etc/sysctl.conf
 echo "vm.vfs_cache_pressure=50" | tee -a /etc/sysctl.conf
@@ -132,22 +149,28 @@ echo lz4hc_compress | tee -a /etc/initramfs-tools/modules
 echo z3fold | tee -a /etc/initramfs-tools/modules
 update-initramfs -u
 update-grub
-#### Configuração Firewall
+
+# Habilitar firewall
 systemctl enable ufw
 ufw enable
-#### Ativar atualizações automáticas
+
+# Ativar atualizações automáticas
 mintupdate-automation upgrade enable
 mintupdate-automation autoremove enable
-#### Desativar serviço de detecção/instalação automática de impressora
+
+# Desativar serviço de detecção/instalação automática de impressora
 systemctl disable cups-browsed.service
-#### Desativar driver problemático do CUPS
+
+# Desativar driver problemático do CUPS
 mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
-### Antivirus
+
+# Antivirus
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
-systemctl enable --now clamav-daemon
+# Descomentar a linha abaixo caso deseje ativar o serviço em segundo plano do ClamAV
+# systemctl enable --now clamav-daemon
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 

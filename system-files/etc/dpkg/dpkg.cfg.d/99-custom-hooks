@@ -1,0 +1,1 @@
+post-invoke=/usr/local/bin/fix-browsers-ca-trust.sh
