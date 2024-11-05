@@ -18,6 +18,11 @@ if ! command -v dialog &> /dev/null; then
     sudo apt -y install dialog
 fi
 
+# Instalar o pacote lsb-release, necessário para obter nome do SO
+if ! command -v lsb_release &> /dev/null; then
+    sudo apt -y install lsb-release
+fi
+
 altera_dns() {
     DNS1=$(\
             dialog --no-cancel --title "DNS primário"\
@@ -49,6 +54,8 @@ dialog_info() {
 dialog_info
 altera_dns
 
+OS_NAME=$(lsb_release -d -s)
+
 DOMINIO=$(\
     dialog --no-cancel --title "Ingresso em domínio Active Directory"\
         --inputbox "Insira o domínio:" 8 45\
@@ -71,7 +78,7 @@ apt -y update
 apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
 
 ### Comando original
-echo $SENHA | realm join -U ${USUARIO} ${DOMINIO}
+echo $SENHA | realm join --os-name $OS_NAME -U ${USUARIO} ${DOMINIO} 
 
 STATUS=$?
 
