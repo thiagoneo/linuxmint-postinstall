@@ -29,13 +29,13 @@ Este script não apenas otimiza a experiência do usuário, mas também simplifi
 
 **Instruções de uso:**
 
-1. Baixe a ISO do Linux Mint 21.2 em https://linuxmint.com/edition.php?id=305 e execute a instalação do S.O.
+1. Baixe a ISO do Linux Mint 21.3 em https://linuxmint.com/edition.php?id=311 e execute a instalação do S.O.
 2. Acesse a página [Releases](https://github.com/thiagoneo/linuxmint-postinstall/releases) do projeto e baixe a última versão (arquivo tar.gz). Extraia esse arquivo.
-3. Faça login na interface de terminal do Linux (pressione as teclas Ctrl + Alt + F2), navegue até a pasta com os arquivos extraídos e execute estes comandos:
+3. [OPCIONAL] Caso tenha algum certificado CA para instalar no sistema, copie-o para a pasta `system-files/usr/local/share/ca-certificates`.
+4. Abra um terminal dentro da pasta com os arquivos extraídos e execute estes comandos:
    ```
    chmod +x *.sh
-   sudo ./script.sh
+   sudo ./start.sh
    ```
-   Obs.: Também é possível abrir um terminal dentro do ambiente gráfico e executar o script. No entanto, isso pode apresentar problemas, como interrupções durante a atualização do sistema, que poderiam encerrar inesperadamente o ambiente gráfico e interromper a execução do script (isso implica também que deve-se salvar todos os trabalhos e fechar os programas antes da execução do script). Portanto, o mais seguro e recomendado é executar o script em um console (TTY) separado.
-4. Após o término da execução, reinicie o sistema.
+5. Após o término da execução, reinicie o sistema.
 
