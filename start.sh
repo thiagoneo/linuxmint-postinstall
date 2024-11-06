@@ -170,8 +170,8 @@ mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
-# Descomentar a linha abaixo caso deseje ativar o serviço em segundo plano do ClamAV
-# systemctl enable --now clamav-daemon
+# Comentar a linha abaixo caso deseje ativar o serviço em segundo plano do ClamAV
+systemctl disable clamav-daemon
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 
