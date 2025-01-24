@@ -172,7 +172,6 @@ chmod +x /etc/clamav/virus-event.bash
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
-# Comentar a linha abaixo caso deseje ativar o serviço em segundo plano do ClamAV
 systemctl enable clamav-daemon
 systemctl restart clamav-daemon
 systemctl enable clamav-clamonacc.service
