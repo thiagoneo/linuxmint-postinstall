@@ -167,11 +167,16 @@ mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 
 # Antivirus
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
+chmod +x /etc/clamav/virus-event.bash
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
 # Comentar a linha abaixo caso deseje ativar o serviço em segundo plano do ClamAV
-systemctl disable clamav-daemon
+systemctl enable clamav-daemon
+systemctl restart clamav-daemon
+systemctl enable clamav-clamonacc.service
+systemctl restart clamav-clamonacc.service
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 
