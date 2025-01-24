@@ -17,6 +17,7 @@ hyphen-pt-br
 ibrazilian
 language-pack-gnome-pt
 language-pack-pt
+libnotify-bin
 libreoffice-help-pt
 libreoffice-help-pt-br
 libreoffice-l10n-pt-br
