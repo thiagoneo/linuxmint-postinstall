@@ -168,6 +168,7 @@ mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 
 # Antivirus
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
+\cp -rf "${SCR_DIRECTORY}"/system-files/etc/system/clamav-clamonacc.service
 chmod +x /etc/clamav/virus-event.bash
 systemctl stop clamav-freshclam
 freshclam
