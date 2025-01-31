@@ -15,6 +15,7 @@ htop
 hunspell-pt-br
 hyphen-pt-br
 ibrazilian
+inotify-tools
 language-pack-gnome-pt
 language-pack-pt
 libnotify-bin
