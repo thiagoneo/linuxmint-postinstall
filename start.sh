@@ -170,6 +170,7 @@ mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/systemd/ /etc/
 chmod +x /etc/clamav/virus-event.bash
+systemctl daemon-reload
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
