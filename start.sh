@@ -112,7 +112,6 @@ sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
 
 # Configuração do gerenciador de telas LightDM (tela de login)
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/lightdm/ /etc/
-\cp -rf "${SCR_DIRECTORY}"/system-files/usr/share/ukui-greeter/ /usr/share/
 
 # Configuração de políticas de navegadores Firefox e Google Chrome
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/firefox/ /etc/
