@@ -180,6 +180,16 @@ systemctl restart clamav-clamonacc.service
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 
+#---------------- BLOQUEIO DE DISPOSITIVOS ARMAZENAMENTO USB -----------------#
+cat <<EOF > "/etc/udev/rules.d/99-usb-block.rules"
+# Bloquear todos os outros dispositivos de armazenamento USB
+ACTION=="add", SUBSYSTEMS=="usb", ATTRS{bInterfaceClass}=="08", ATTRS{bInterfaceSubClass}=="06", ATTRS{bInterfaceProtocol}=="50", RUN+="/bin/sh -c 'echo 0 > /sys%p/authorized'"
+
+# Fim da regra
+LABEL="usb_storage_end"
+EOF
+udevadm control --reload-rules && udevadm trigger
+
 #------------------------------------ FIM -------------------------------------#
 
 dialog --erase-on-exit --yesno "Chegamos ao fim. É necessário reiniciar o computador para aplicar as alterações. Deseja reiniciar agora?" 8 60
