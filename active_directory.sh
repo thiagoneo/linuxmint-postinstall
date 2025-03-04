@@ -78,7 +78,7 @@ apt -y update
 apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
 
 ### Comando original
-echo $SENHA | realm join --os-name $OS_NAME -U ${USUARIO} ${DOMINIO} 
+echo $SENHA | realm join --os-name $OS_NAME -U ${USUARIO} ${DOMINIO} >> /dev/null
 
 STATUS=$?
 
@@ -92,8 +92,10 @@ sed -i "s/use_fully_qualified_names = True/use_fully_qualified_names = False/g" 
 
 systemctl restart sssd
 
+MSG_SUCESSO="Bem-vindo ao domínio ${DOMINIO}!"
+
 if [[ $STATUS -eq 0 ]]; then
-    timeout 10 dialog --no-cancel --msgbox "Bem-vindo ao domínio ${DOMINIO:-Desconhecido}!" 8 45
+    timeout --preserve-status --foreground 10 sh -c "dialog --no-cancel --msgbox \"Bem-vindo ao domínio ${DOMINIO}!\" 8 45"
 else
     dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
 fi
