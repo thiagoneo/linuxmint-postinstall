@@ -95,6 +95,6 @@ systemctl restart sssd
 if [[ $STATUS -eq 0 ]]; then
     timeout 10 dialog --no-cancel --msgbox "Bem-vindo ao domínio ${DOMINIO:-Desconhecido}!" 8 45
 else
-    dialog --no-cancel --colors --msgbox "ERRO: Não foi possível ingressar no domínio." 8 45
+    dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
 fi
 
