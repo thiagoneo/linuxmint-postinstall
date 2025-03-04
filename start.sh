@@ -56,7 +56,7 @@ JOIN_AD=$?
 rm /etc/resolv.conf
 systemctl restart NetworkManager.service
 case $JOIN_AD in
-    0) bash "${SCR_DIRECTORY}"/active_directory.sh;;
+    0) bash "${SCR_DIRECTORY}"/active_directory.sh ; clear ;;
     1) echo "Você escolheu não ingressar no Active Directory";;
     255) echo "[ESC] key pressed.";;
 esac
