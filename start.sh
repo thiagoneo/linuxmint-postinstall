@@ -165,7 +165,7 @@ systemctl disable cups-browsed.service
 mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 
-# Antivirus
+#------------------------------ CLAMAV ANTIVIRUS ------------------------------#
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/systemd/ /etc/
 chmod +x /etc/clamav/virus-event.bash
@@ -173,10 +173,14 @@ systemctl daemon-reload
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
-systemctl enable clamav-daemon
-systemctl restart clamav-daemon
-systemctl enable clamav-clamonacc.service
-systemctl restart clamav-clamonacc.service
+# Habilitar serviço
+dialog --title "ClamAV Antivirus" --erase-on-exit --defaultno --yesno "Deseja habilitar a proteção em tempo real do ClamAV Antivirus?\n\n(Nota: Pode causar lentidão em hardware antigo e/ou menos potente)" 10 60
+ENABLE_CLAMAV=$?
+case $ENABLE_CLAMAV in
+    0) systemctl enable clamav-daemon ; systemctl restart clamav-daemon ; systemctl enable clamav-clamonacc.service ; systemctl restart clamav-clamonacc.service ;;
+    1) systemctl disable clamav-daemon ; systemctl stop clamav-daemon ; systemctl disable clamav-clamonacc.service ; systemctl stop clamav-clamonacc.service ; echo "Você escolheu não habilitar o serviço do ClamAV.";;
+    255) echo "[ESC] key pressed.";;
+esac
 chown -R 1000:1000 "${SCR_DIRECTORY}"/
 chmod -R 777 "${SCR_DIRECTORY}"/
 
