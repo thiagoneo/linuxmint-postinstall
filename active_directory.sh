@@ -99,4 +99,5 @@ if [[ $STATUS -eq 0 ]]; then
 else
     dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
 fi
-
+# Voltar para o início da linha
+echo -ne "\r"
