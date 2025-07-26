@@ -3,6 +3,7 @@ avahi-daemon
 avahi-utils
 celluloid
 drawing
+gnome-keyring
 hexchat
 hypnotix
 libreoffice-style-breeze
