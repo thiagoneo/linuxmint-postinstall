@@ -5,18 +5,5 @@
   "MaxConnectionsPerProxy": 99,
   "MetricsReportingEnabled": false,
   "AutoFillEnabled": false,
-  "PromotionalTabsEnabled": false,
-  "URLBlocklist": [
-    "https://remotedesktop-pa.googleapis.com",
-    "https://remotedesktop.google.com"
-  ],
-  "ManagedBookmarks": [
-    {
-      "toplevel_name": "Links"
-    },
-    {
-      "name": "Gmail",
-      "url": "mail.google.com"
-    }
-  ]
+  "PromotionalTabsEnabled": false
 }
