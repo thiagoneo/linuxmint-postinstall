@@ -6,7 +6,6 @@
   "MetricsReportingEnabled": false,
   "AutoFillEnabled": false,
   "PromotionalTabsEnabled": false,
-  "PasswordManagerEnabled": false,
   "URLBlocklist": [
     "https://remotedesktop-pa.googleapis.com",
     "https://remotedesktop.google.com"
