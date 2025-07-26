@@ -91,6 +91,9 @@ cd "${SCR_DIRECTORY}"
 grep -v '^#' pacotes_baixar.txt | wget -i - -P pacotes
 apt install "${SCR_DIRECTORY}"/pacotes/*.deb --no-install-recommends -y
 
+#---------------------- BLOQUEAR ATUALIZAÇÕES DE PACOTES -----------------------#
+apt-mark hold lightdm ukui-greeter language-pack-pt language-pack-pt-base liblightdm-gobject-1-0 liblightdm-qt5-3-0
+
 # Remover impressoras adicionadas automaticamente
 lpadmin -x DCPL5652DN
 lpadmin -x HLL6202DW
