@@ -189,7 +189,7 @@ chmod -R 777 "${SCR_DIRECTORY}"/
 
 #---------------- BLOQUEIO DE DISPOSITIVOS ARMAZENAMENTO USB -----------------#
 cat <<EOF > "/etc/udev/rules.d/99-usb-block.rules"
-# Bloquear todos os outros dispositivos de armazenamento USB
+# Bloquear todos os dispositivos de armazenamento USB
 ACTION=="add", SUBSYSTEMS=="usb", ATTRS{bInterfaceClass}=="08", ATTRS{bInterfaceSubClass}=="06", ATTRS{bInterfaceProtocol}=="50", RUN+="/bin/sh -c 'echo 0 > /sys%p/authorized'"
 
 # Fim da regra
