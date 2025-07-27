@@ -23,6 +23,25 @@ if ! command -v lsb_release &> /dev/null; then
     sudo apt -y install lsb-release
 fi
 
+# Configuração de DNS no NetworkManager
+# Necessário para evitar problemas de resolução de nomes ao ingressar no AD
+cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bkp.$(date +%s)
+cat <<EOF > "/etc/NetworkManager/NetworkManager.conf"
+[main]
+plugins=ifupdown,keyfile
+dns=default
+
+[ifupdown]
+managed=false
+
+[device]
+wifi.scan-rand-mac-address=no
+EOF
+
+# Remover resolv.conf existente e reiniciar o NetworkManager
+rm /etc/resolv.conf
+systemctl restart NetworkManager.service
+
 altera_dns() {
     DNS1=$(\
             dialog --no-cancel --title "DNS primário"\
@@ -95,7 +114,7 @@ systemctl restart sssd
 MSG_SUCESSO="Bem-vindo ao domínio ${DOMINIO}!"
 
 if [[ $STATUS -eq 0 ]]; then
-    timeout --preserve-status --foreground 10 sh -c "dialog --no-cancel --msgbox \"Bem-vindo ao domínio ${DOMINIO}!\" 8 45"
+    dialog --no-cancel --msgbox \"Bem-vindo ao domínio ${DOMINIO}!\" 8 45
 else
     dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
 fi

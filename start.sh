@@ -15,6 +15,19 @@ fi
 #--------------------------------- VARIÁVEIS ----------------------------------#
 SCR_DIRECTORY=`pwd`
 
+
+#---------------------- VERIFICAR CONEXÃO COM A INTERNET ---------------------#
+if ! ping -c 1 8.8.8.8 &>/dev/null; then
+    echo "Sem conexão com a internet. Por favor, conecte-se à internet e tente novamente."
+    exit 1
+fi
+
+#------------------- ATUALIZAR BASE DE DADOS DO REPOSITÓRIO -------------------#
+if ! apt update -y; then
+    echo "Falha ao atualizar a base de dados dos repositórios. Verifique sua conexão ou os repositórios configurados."
+    exit 1
+fi
+
 #------------------- ATUALIZAR BASE DE DADOS DO REPOSITÓRIO -------------------#
 apt update -y
 
@@ -51,13 +64,18 @@ esac
 #------------------------------ ACTIVE DIRECTORY ------------------------------#
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um domínio Active Directory?" 8 60
 JOIN_AD=$?
-##### Copiar arquivo de config. Network Manager para corrigir erro do DNS
-\cp -rf "${SCR_DIRECTORY}"/system-files/etc/NetworkManager/ /etc/
-rm /etc/resolv.conf
-systemctl restart NetworkManager.service
 case $JOIN_AD in
     0) bash "${SCR_DIRECTORY}"/active_directory.sh ; clear ;;
     1) echo "Você escolheu não ingressar no Active Directory";;
+    255) echo "[ESC] key pressed.";;
+esac
+
+#----------------------------- CLAMAV ANTIVIRUS -------------------------------#
+dialog --title "ClamAV Antivirus" --erase-on-exit --yesno "Deseja instalar o antivírus ClamAV e habilitar a proteção em tempo real neste computador?\n\n(Nota: Pode causar lentidão em hardware antigo e/ou menos potente)" 10 70
+INSTALL_CLAMAV=$?
+case $INSTALL_CLAMAV in
+    0) echo "Iniciando instalação do ClamAV..." ; bash "${SCR_DIRECTORY}"/install_clamav_antivirus.sh ; clear ;;
+    1) echo "Você escolheu não instalar o antivírus.";;
     255) echo "[ESC] key pressed.";;
 esac
 
@@ -167,41 +185,6 @@ systemctl disable cups-browsed.service
 # Desativar driver problemático do CUPS
 mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
-
-#------------------------------ CLAMAV ANTIVIRUS ------------------------------#
-# Verificar e instalar pacotes ClamAV
-for pkg in clamav clamav-daemon clamtk clamtk-gnome; do
-    if ! dpkg -s "$pkg" &>/dev/null; then
-        echo "Instalando pacote: $pkg"
-        apt-get install -y "$pkg"
-    else
-        echo "Pacote já instalado: $pkg"
-    fi
-done
-\cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
-\cp -rf "${SCR_DIRECTORY}"/system-files/etc/systemd/ /etc/
-mkdir -p /var/clamav/quarantine
-chown -R clamav:clamav /var/clamav/quarantine
-chmod 700 /var/clamav/quarantine
-chmod +x /etc/clamav/virus-event.bash
-systemctl daemon-reload
-systemctl stop clamav-freshclam
-freshclam
-systemctl enable --now clamav-freshclam
-# Limpeza automática da quarentena do ClamAV (executado via anacron/cron.daily)
-cat <<EOF > /etc/cron.daily/clamav-quarantine-clean
-#!/bin/bash
-find /var/clamav/quarantine -type f -mtime +30 -delete
-EOF
-chmod +x /etc/cron.daily/clamav-quarantine-clean
-# Habilitar serviço
-dialog --title "ClamAV Antivirus" --erase-on-exit --defaultno --yesno "Deseja habilitar a proteção em tempo real do ClamAV Antivirus?\n\n(Nota: Pode causar lentidão em hardware antigo e/ou menos potente)" 10 60
-ENABLE_CLAMAV=$?
-case $ENABLE_CLAMAV in
-    0) systemctl enable clamav-daemon ; systemctl restart clamav-daemon ; systemctl enable clamav-clamonacc.service ; systemctl restart clamav-clamonacc.service ;;
-    1) systemctl disable clamav-daemon ; systemctl stop clamav-daemon ; systemctl disable clamav-clamonacc.service ; systemctl stop clamav-clamonacc.service ; echo "Você escolheu não habilitar o serviço do ClamAV.";;
-    255) echo "[ESC] key pressed.";;
-esac
 
 #---------------- BLOQUEIO DE DISPOSITIVOS ARMAZENAMENTO USB -----------------#
 cat <<EOF > "/etc/udev/rules.d/99-usb-block.rules"
