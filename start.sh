@@ -169,13 +169,31 @@ mkdir -p /usr/lib/cups/driver/disabled
 mv /usr/lib/cups/driver/driverless /usr/lib/cups/driver/disabled/
 
 #------------------------------ CLAMAV ANTIVIRUS ------------------------------#
+# Verificar e instalar pacotes ClamAV
+for pkg in clamav clamav-daemon clamtk clamtk-gnome; do
+    if ! dpkg -s "$pkg" &>/dev/null; then
+        echo "Instalando pacote: $pkg"
+        apt-get install -y "$pkg"
+    else
+        echo "Pacote já instalado: $pkg"
+    fi
+done
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/clamav/ /etc/
 \cp -rf "${SCR_DIRECTORY}"/system-files/etc/systemd/ /etc/
+mkdir -p /var/clamav/quarantine
+chown -R clamav:clamav /var/clamav/quarantine
+chmod 700 /var/clamav/quarantine
 chmod +x /etc/clamav/virus-event.bash
 systemctl daemon-reload
 systemctl stop clamav-freshclam
 freshclam
 systemctl enable --now clamav-freshclam
+# Limpeza automática da quarentena do ClamAV (executado via anacron/cron.daily)
+cat <<EOF > /etc/cron.daily/clamav-quarantine-clean
+#!/bin/bash
+find /var/clamav/quarantine -type f -mtime +30 -delete
+EOF
+chmod +x /etc/cron.daily/clamav-quarantine-clean
 # Habilitar serviço
 dialog --title "ClamAV Antivirus" --erase-on-exit --defaultno --yesno "Deseja habilitar a proteção em tempo real do ClamAV Antivirus?\n\n(Nota: Pode causar lentidão em hardware antigo e/ou menos potente)" 10 60
 ENABLE_CLAMAV=$?
@@ -184,8 +202,6 @@ case $ENABLE_CLAMAV in
     1) systemctl disable clamav-daemon ; systemctl stop clamav-daemon ; systemctl disable clamav-clamonacc.service ; systemctl stop clamav-clamonacc.service ; echo "Você escolheu não habilitar o serviço do ClamAV.";;
     255) echo "[ESC] key pressed.";;
 esac
-chown -R 1000:1000 "${SCR_DIRECTORY}"/
-chmod -R 777 "${SCR_DIRECTORY}"/
 
 #---------------- BLOQUEIO DE DISPOSITIVOS ARMAZENAMENTO USB -----------------#
 cat <<EOF > "/etc/udev/rules.d/99-usb-block.rules"
@@ -198,6 +214,7 @@ EOF
 udevadm control --reload-rules && udevadm trigger
 
 #------------------------------------ FIM -------------------------------------#
+chown -R 1000:1000 "${SCR_DIRECTORY}"/
 
 dialog --erase-on-exit --yesno "Chegamos ao fim. É necessário reiniciar o computador para aplicar as alterações. Deseja reiniciar agora?" 8 60
 REBOOT=$?
