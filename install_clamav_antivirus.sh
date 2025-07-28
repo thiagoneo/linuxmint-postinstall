@@ -176,8 +176,9 @@ PERMISSIONS=(
     "/var/log/** rw,"
     "/tmp/** rw,"
     "/proc/*/cgroup r,"
+    "/usr/bin/date ixr,"
 )
-
+echo "[*] Configurando permissões AppArmor..."
 for PERM in "${PERMISSIONS[@]}"; do
     if grep -qF "$PERM" "$PROFILE"; then
         echo "[✔] Permissão já existe: $PERM"
