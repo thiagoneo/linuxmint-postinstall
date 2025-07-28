@@ -70,6 +70,15 @@ case $JOIN_AD in
     255) echo "[ESC] key pressed.";;
 esac
 
+#-------------------------------- ATIVAR SSH ----------------------------------#
+dialog --erase-on-exit --yesno "Deseja instalar o serviço SSH?" 8 60
+INSTALL_SSH=$?
+case $INSTALL_SSH in
+    0) apt -y install openssh-server ; ufw allow ssh ;;
+    1) echo "Você escolheu não instalar o SSH server.";;
+    255) echo "[ESC] key pressed.";;
+esac
+
 #----------------------------- CLAMAV ANTIVIRUS -------------------------------#
 dialog --title "ClamAV Antivirus" --erase-on-exit --yesno "Deseja instalar o antivírus ClamAV e habilitar a proteção em tempo real neste computador?\n\n(Nota: Pode causar lentidão em hardware antigo e/ou menos potente)" 10 70
 INSTALL_CLAMAV=$?
