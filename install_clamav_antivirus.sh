@@ -119,7 +119,9 @@ if [[ "\$CLAM_VIRUSEVENT_FILENAME" == "\$QUARANTINE_DIR"* ]]; then
     exit 0
 fi
 
-echo "\$(date +"%Y-%m-%d_%H:%M:%S.00") Assinatura detectada pelo ClamAV: \$CLAM_VIRUSEVENT_VIRUSNAME em \$CLAM_VIRUSEVENT_FILENAME" >> /var/log/clamav/virus-event.log
+DATA_HORA=\$(date +"%Y-%m-%d_%H:%M:%S.00")
+
+echo "\${DATA_HORA} Assinatura detectada pelo ClamAV: \$CLAM_VIRUSEVENT_VIRUSNAME em \$CLAM_VIRUSEVENT_FILENAME" >> /var/log/clamav/virus-event.log
 EOF
 
 # Criação do arquivo logrotate para o virus-event
