@@ -106,6 +106,7 @@ OnAccessIncludePath /home
 OnAccessPrevention no
 # Perform scans on newly created, moved, or renamed files
 OnAccessExtraScanning yes
+ConcurrentDatabaseReload no
 VirusEvent /etc/clamav/virus-event.bash
 EOF
 
