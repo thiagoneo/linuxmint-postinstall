@@ -71,7 +71,7 @@ case $JOIN_AD in
 esac
 
 #-------------------------------- ATIVAR SSH ----------------------------------#
-dialog --erase-on-exit --yesno "Deseja instalar o serviço SSH?" 8 60
+dialog --erase-on-exit --defaultno --yesno "Deseja instalar o serviço SSH?" 8 60
 INSTALL_SSH=$?
 case $INSTALL_SSH in
     0) apt -y install openssh-server ; ufw allow ssh ;;
