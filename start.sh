@@ -88,6 +88,43 @@ case $INSTALL_CLAMAV in
     255) echo "[ESC] key pressed.";;
 esac
 
+#------------------ INSTALAR DRIVERS ADICIONAIS DE IMPRESSORA -----------------#
+mkdir -p "${SCR_DIRECTORY}"/pacotes/drivers/brother
+mkdir -p "${SCR_DIRECTORY}"/pacotes/drivers/samsung
+
+# Brother:
+wget -c https://download.brother.com/welcome/dlf102573/hll6402dwlpr-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+wget -c https://download.brother.com/welcome/dlf102574/hll6402dwcupswrapper-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+wget -c https://download.brother.com/welcome/dlf102561/hll6202dwlpr-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+wget -c https://download.brother.com/welcome/dlf102562/hll6202dwcupswrapper-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+wget -c https://download.brother.com/welcome/dlf102593/dcpl5652dnlpr-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+wget -c https://download.brother.com/welcome/dlf102594/dcpl5652dncupswrapper-3.5.1-1.i386.deb -P "${SCR_DIRECTORY}"/pacotes/drivers/brother
+echo ""
+echo "Instalando drivers de impressora Brother 🖨️ ..."
+apt install "${SCR_DIRECTORY}"/pacotes/drivers/brother/*.deb --no-install-recommends -y
+# Remover impressoras adicionadas automaticamente
+lpadmin -x DCPL5652DN
+lpadmin -x HLL6202DW
+lpadmin -x HLL6402DW
+
+# Samsung:
+wget -c https://ftp.hp.com/pub/softlib/software13/printers/SS/SL-C4010ND/uld_V1.00.39_01.17.tar.gz -P "${SCR_DIRECTORY}"/pacotes/drivers/samsung
+cd "${SCR_DIRECTORY}"/pacotes/drivers/samsung
+tar -xvzf uld_V1.00.39_01.17.tar.gz
+echo ""
+echo "Instalando drivers de impressora Samsung 🖨️ ..."
+cd "${SCR_DIRECTORY}"/pacotes/drivers/samsung/uld
+export SKIP_EULA_PAGER=1
+export AGREE_EULA='y'
+export CONTINUE_INSTALL='y'
+export CONFIGURE_FIREWALL='n'
+export QUIT_INSTALL='0'
+chmod +x install.sh
+./install.sh
+
+# Voltar para o diretório do script
+cd "${SCR_DIRECTORY}"
+
 #--------------------- INSTALAR PACOTE DE FONTES MICROSOFT --------------------#
 echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
 apt install -y ttf-mscorefonts-installer
@@ -120,11 +157,6 @@ apt install "${SCR_DIRECTORY}"/pacotes/*.deb --no-install-recommends -y
 
 #---------------------- BLOQUEAR ATUALIZAÇÕES DE PACOTES -----------------------#
 apt-mark hold gnome-keyring lightdm ukui-greeter language-pack-pt language-pack-pt-base liblightdm-gobject-1-0 liblightdm-qt5-3-0
-
-# Remover impressoras adicionadas automaticamente
-lpadmin -x DCPL5652DN
-lpadmin -x HLL6202DW
-lpadmin -x HLL6402DW
 
 #---------------- DESINSTALAR PACOTES DESNECESSÁRIOS - PARTE 2 ----------------#
 apt purge $(cat "${SCR_DIRECTORY}"/pacotes_remover.txt) -y
