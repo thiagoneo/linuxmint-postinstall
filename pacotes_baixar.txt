@@ -2,10 +2,3 @@
 https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 # Rustdesk:
 https://github.com/rustdesk/rustdesk/releases/download/1.4.0/rustdesk-1.4.0-x86_64.deb
-# Drivers de impressoras Brother:
-https://download.brother.com/welcome/dlf102573/hll6402dwlpr-3.5.1-1.i386.deb
-https://download.brother.com/welcome/dlf102574/hll6402dwcupswrapper-3.5.1-1.i386.deb
-https://download.brother.com/welcome/dlf102561/hll6202dwlpr-3.5.1-1.i386.deb
-https://download.brother.com/welcome/dlf102562/hll6202dwcupswrapper-3.5.1-1.i386.deb
-https://download.brother.com/welcome/dlf102593/dcpl5652dnlpr-3.5.1-1.i386.deb
-https://download.brother.com/welcome/dlf102594/dcpl5652dncupswrapper-3.5.1-1.i386.deb
