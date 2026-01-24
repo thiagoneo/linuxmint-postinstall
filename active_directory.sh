@@ -59,8 +59,9 @@ altera_dns() {
     
     for CONN_NAME in $(nmcli --fields NAME --terse connection show)
     do
-        sudo nmcli connection modify  "$CONN_NAME" ipv4.ignore-auto-dns true
-        sudo nmcli connection modify  "$CONN_NAME" ipv4.dns "${DNS1} ${DNS2}"
+        sudo nmcli connection modify "$CONN_NAME" ipv4.ignore-auto-dns true
+        sudo nmcli connection modify "$CONN_NAME" ipv4.dns "${DNS1} ${DNS2}"
+        sudo nmcli connection modify "$CONN_NAME" ipv4.dns-search "$DOMINIO"
         sudo nmcli connection down "$CONN_NAME"
         sudo nmcli connection up "$CONN_NAME"
     done
@@ -80,6 +81,7 @@ DOMINIO=$(\
         --inputbox "Insira o domínio:" 8 45\
     3>&1 1>&2 2>&3 3>&- \
 )
+DOMINIO=$(echo "$DOMINIO" | tr '[:upper:]' '[:lower:]')
 
 USUARIO=$(\
     dialog --no-cancel --title "Ingresso em domínio Active Directory"\
