@@ -42,6 +42,19 @@ EOF
 rm /etc/resolv.conf
 systemctl restart NetworkManager.service
 
+## TODO
+# # Configuração de systemd-timesyncd
+# # Necessário para sincronizar relógio com o servidor AD
+# cp /etc/systemd/timesyncd.conf  /etc/systemd/timesyncd.conf.bkp
+# cat <<EOF > "/etc/systemd/timesyncd.conf"
+# [Time]
+# NTP=DC1.domain.local DC2.domain.local
+# FallbackNTP=ntp.ubuntu.com
+# #RootDistanceMaxSec=5
+# #PollIntervalMinSec=32
+# #PollIntervalMaxSec=2048
+ 
+
 altera_dns() {
     DNS1=$(\
             dialog --no-cancel --title "DNS primário"\
