@@ -65,7 +65,7 @@ esac
 dialog --erase-on-exit --yesno "Deseja ingressar este computador em um domínio Active Directory?" 8 60
 JOIN_AD=$?
 case $JOIN_AD in
-    0) bash "${SCR_DIRECTORY}"/active_directory.sh ; clear ;;
+    0) bash "${SCR_DIRECTORY}"/active_directory.sh --no-change-hostname ; clear ;;
     1) echo "Você escolheu não ingressar no Active Directory";;
     255) echo "[ESC] key pressed.";;
 esac

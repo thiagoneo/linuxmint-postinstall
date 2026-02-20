@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 ##################################################################
 # Script para automatizar o processo de ingressar um computador  #
 # rodando Linux (Debian, Ubuntu e derivados) no Active Directory #
@@ -23,9 +25,35 @@ if ! command -v lsb_release &> /dev/null; then
     sudo apt -y install lsb-release
 fi
 
-# Configuração de DNS no NetworkManager
+#--------------------------- DEFINIR NOVO HOSTNAME ----------------------------#
+ALTERA_HOSTNAME=true
+
+for arg in "$@"; do
+    case "$arg" in
+        --no-change-hostname)
+        ALTERA_HOSTNAME=false
+        ;;
+    esac
+done
+
+if $ALTERA_HOSTNAME; then
+    OLD_HOSTNAME=`hostname`
+    NEW_HOSTNAME=$(\
+        dialog --no-cancel --title "Definir hostname"\
+            --inputbox "Insira o nome do computador:" 8 40\
+        3>&1 1>&2 2>&3 3>&- \
+    )
+    echo ""
+    sed -i "s/${OLD_HOSTNAME}/${NEW_HOSTNAME}/g" /etc/hosts
+    hostnamectl set-hostname ${NEW_HOSTNAME}
+    echo "Novo HOSTNAME definido como ${NEW_HOSTNAME}"
+else
+    echo "Alteração de hostname ignorada (--no-change-hostname)"
+fi
+
+#----------------------- CONFIGURAÇÃO NETWORK-MANAGER ------------------------#
 # Necessário para evitar problemas de resolução de nomes ao ingressar no AD
-cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bkp.$(date +%s)
+cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bkp
 cat <<EOF > "/etc/NetworkManager/NetworkManager.conf"
 [main]
 plugins=ifupdown,keyfile
@@ -42,52 +70,20 @@ EOF
 rm /etc/resolv.conf
 systemctl restart NetworkManager.service
 
-## TODO
-# # Configuração de systemd-timesyncd
-# # Necessário para sincronizar relógio com o servidor AD
-# cp /etc/systemd/timesyncd.conf  /etc/systemd/timesyncd.conf.bkp
-# cat <<EOF > "/etc/systemd/timesyncd.conf"
-# [Time]
-# NTP=DC1.domain.local DC2.domain.local
-# FallbackNTP=ntp.ubuntu.com
-# #RootDistanceMaxSec=5
-# #PollIntervalMinSec=32
-# #PollIntervalMaxSec=2048
- 
+#------------------ SOLICITAR INFORMACOES DE DNS E DOMINIO -------------------#
+dialog --erase-on-exit --title "Aviso" --msgbox 'A seguir, insira o servidor DNS para resolver o domínio. Normalmente, o IP do servidor DNS é o mesmo do Controlador de Domínio, a menos que sejam servidores distintos.' 8 60
 
-altera_dns() {
-    DNS1=$(\
-            dialog --no-cancel --title "DNS primário"\
-                --inputbox "Insira o servidor DNS primário:" 8 40\
-            3>&1 1>&2 2>&3 3>&- \
-        )
-    
-    DNS2=$(\
-            dialog --no-cancel --title "DNS secundário"\
-                --inputbox "Insira o servidor DNS secundário (opcional):" 8 40\
-            3>&1 1>&2 2>&3 3>&- \
-        )
-    
-    IFS=$'\n'
-    
-    for CONN_NAME in $(nmcli --fields NAME --terse connection show)
-    do
-        sudo nmcli connection modify "$CONN_NAME" ipv4.ignore-auto-dns true
-        sudo nmcli connection modify "$CONN_NAME" ipv4.dns "${DNS1} ${DNS2}"
-        sudo nmcli connection modify "$CONN_NAME" ipv4.dns-search "$DOMINIO"
-        sudo nmcli connection down "$CONN_NAME"
-        sudo nmcli connection up "$CONN_NAME"
-    done
-}
+DNS1=$(\
+        dialog --no-cancel --title "DNS primário"\
+            --inputbox "Insira o servidor DNS primário:" 8 40\
+        3>&1 1>&2 2>&3 3>&- \
+    )
 
-dialog_info() {
-    dialog --erase-on-exit --title "Aviso" --msgbox 'A seguir, insira o servidor DNS para resolver o domínio. Normalmente, o IP do servidor DNS é o mesmo do Controlador de Domínio, a menos que sejam servidores distintos.' 8 60
-}
-
-dialog_info
-altera_dns
-
-OS_NAME=$(lsb_release -d -s)
+DNS2=$(\
+        dialog --no-cancel --title "DNS secundário"\
+            --inputbox "Insira o servidor DNS secundário (opcional):" 8 40\
+        3>&1 1>&2 2>&3 3>&- \
+    )
 
 DOMINIO=$(\
     dialog --no-cancel --title "Ingresso em domínio Active Directory"\
@@ -95,6 +91,8 @@ DOMINIO=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 DOMINIO=$(echo "$DOMINIO" | tr '[:upper:]' '[:lower:]')
+
+OS_NAME=$(lsb_release -d -s)
 
 USUARIO=$(\
     dialog --no-cancel --title "Ingresso em domínio Active Directory"\
@@ -108,6 +106,19 @@ SENHA=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 
+#-------------------------------- ALTERAR DNS --------------------------------#
+IFS=$'\n'
+
+for CONN_NAME in $(nmcli --fields NAME --terse connection show)
+do
+    sudo nmcli connection modify "$CONN_NAME" ipv4.ignore-auto-dns true
+    sudo nmcli connection modify "$CONN_NAME" ipv4.dns "${DNS1} ${DNS2}"
+    sudo nmcli connection modify "$CONN_NAME" ipv4.dns-search "$DOMINIO"
+    sudo nmcli connection down "$CONN_NAME"
+    sudo nmcli connection up "$CONN_NAME"
+done
+
+#------------------------------ INGRESSAR NO AD ------------------------------#
 apt -y update
 apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
 
@@ -116,6 +127,12 @@ echo $SENHA | realm join --os-name $OS_NAME -U ${USUARIO} ${DOMINIO} >> /dev/nul
 
 STATUS=$?
 
+if [[ $STATUS -ne 0 ]]; then
+    dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
+    exit 1
+fi
+
+#------------------------------ PÓS-CONFIGURAÇÃO -----------------------------#
 # Habilitar criacao automatica de pastas de usuarios ao fazer logon
 if ! grep -q "session.*required.*pam_mkhomedir.so.*umask.*" /etc/pam.d/common-session; then
     echo 'session required                        pam_mkhomedir.so umask=0027 skel=/etc/skel' >> /etc/pam.d/common-session
@@ -126,12 +143,26 @@ sed -i "s/use_fully_qualified_names = True/use_fully_qualified_names = False/g" 
 
 systemctl restart sssd
 
-MSG_SUCESSO="Bem-vindo ao domínio ${DOMINIO}!"
-
-if [[ $STATUS -eq 0 ]]; then
-    dialog --no-cancel --msgbox \"Bem-vindo ao domínio ${DOMINIO}!\" 8 45
-else
-    dialog --no-cancel --colors --msgbox "\Z1ERRO: Não foi possível ingressar no domínio." 8 45
-fi
-# Limpar terminal e voltar para o início da linha
-clear
+# Configuração do systemd-timesyncd
+# Necessário para sincronizar relógio com o AD
+DC_LIST=$(host -t SRV "_ldap._tcp.dc._msdcs.${DOMINIO}" 2>/dev/null | \
+        grep "SRV record" | \
+        awk '{print $NF}' | \
+        sed 's/\.$//' | \
+        sort -u | \
+        tr "\n" " ")
+cp /etc/systemd/timesyncd.conf  /etc/systemd/timesyncd.conf.bkp
+cat <<EOF > "/etc/systemd/timesyncd.conf"
+[Time]
+NTP=${DC_LIST}
+FallbackNTP=ntp.ubuntu.com
+#RootDistanceMaxSec=5
+#PollIntervalMinSec=32
+#PollIntervalMaxSec=2048
+EOF
+# Reiniciar serviço
+systemctl restart systemd-timesyncd.service
+timedatectl set-ntp false
+timedatectl set-ntp true
+# Mensagem de sucesso
+dialog --no-cancel --msgbox "Bem-vindo ao domínio ${DOMINIO}!" 8 45
