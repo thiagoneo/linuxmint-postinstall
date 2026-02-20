@@ -114,6 +114,10 @@ do
     sudo nmcli connection modify "$CONN_NAME" ipv4.ignore-auto-dns true
     sudo nmcli connection modify "$CONN_NAME" ipv4.dns "${DNS1} ${DNS2}"
     sudo nmcli connection modify "$CONN_NAME" ipv4.dns-search "$DOMINIO"
+done
+
+for CONN_NAME in $(nmcli --fields NAME --terse connection show --active)
+do
     sudo nmcli connection down "$CONN_NAME"
     sudo nmcli connection up "$CONN_NAME"
 done
