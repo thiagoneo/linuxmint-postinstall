@@ -136,6 +136,9 @@ done
 
 #------------------------------ INGRESSAR NO AD ------------------------------#
 apt -y update
+# Pré-configura o reino do Kerberos para evitar o diálogo interativo
+echo "krb5-config krb5-config/default_realm string ${DOMINIO^^}" | debconf-set-selections
+# Instalar os pacotes necessários para ingressar no domínio e autenticação
 apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit adsys krb5-user smbclient
 
 ### Comando original
@@ -263,8 +266,9 @@ cat <<EOF > "/etc/systemd/system/sync_ad_files.timer"
 Description=Agenda a sincronizacao de arquivos a cada 15 minutos
 
 [Timer]
-OnBootSec=5s
-OnUnitActiveSec=15min
+OnBootSec=20s
+OnCalendar=*:0,15,30,45
+RandomizedDelaySec=300
 Persistent=true
 
 [Install]
@@ -274,9 +278,13 @@ EOF
 systemctl daemon-reload
 systemctl enable --now sync_ad_files.timer
 
+# Criar arquivo de configuração para o adsys (recomendado para evitar problemas de resolução de nomes)
 cat <<EOF > "/etc/adsys.yaml"
 ad_use_fully_qualified_names: false
 EOF
+
+rm -rf /var/cache/adsys/*
+adsysctl policy update -all -v
 
 # Executar a sincronização inicial imediatamente
 sync_ad_files
