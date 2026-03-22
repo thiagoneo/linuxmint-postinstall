@@ -284,7 +284,7 @@ ad_use_fully_qualified_names: false
 EOF
 
 rm -rf /var/cache/adsys/*
-adsysctl policy update -all -v
+adsysctl policy update --all -v
 
 # Executar a sincronização inicial imediatamente
 sync_ad_files
