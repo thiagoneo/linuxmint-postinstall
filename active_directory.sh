@@ -154,11 +154,22 @@ fi
 #------------------------------ PÓS-CONFIGURAÇÃO -----------------------------#
 # Habilitar criacao automatica de pastas de usuarios ao fazer logon
 if ! grep -q "session.*required.*pam_mkhomedir.so.*umask.*" /etc/pam.d/common-session; then
-    echo 'session required                        pam_mkhomedir.so umask=0027 skel=/etc/skel' >> /etc/pam.d/common-session
+    echo 'session required                        pam_mkhomedir.so umask=0077 skel=/etc/skel' >> /etc/pam.d/common-session
 fi
 
 # Permitir fazer login sem a necessidade de acrescentar o sufixo "@dominio" ao nome de usuário:
-sed -i "s/use_fully_qualified_names = True/use_fully_qualified_names = False/g" /etc/sssd/sssd.conf
+# 1. Se a linha já existir (com qualquer valor), substitui pelo domínio correto
+if grep -q "default_domain_suffix" /etc/sssd/sssd.conf; then
+    sed -i "s/^default_domain_suffix =.*/default_domain_suffix = ${DOMINIO}/" /etc/sssd/sssd.conf
+    echo "Sufixo de domínio atualizado para ${DOMINIO}."
+else
+# 2. Se não existir, insere logo abaixo de [sssd]
+    sed -i "/^\[sssd\]/a default_domain_suffix = ${DOMINIO}" /etc/sssd/sssd.conf
+    echo "Sufixo de domínio configurado."
+fi
+
+3. Garante que o use_fully_qualified_names esteja como True para o ADSys
+sed -i "s/use_fully_qualified_names =.*/use_fully_qualified_names = True/g" /etc/sssd/sssd.conf
 
 systemctl restart sssd
 
@@ -277,11 +288,6 @@ EOF
 
 systemctl daemon-reload
 systemctl enable --now sync_ad_files.timer
-
-# Criar arquivo de configuração para o adsys (recomendado para evitar problemas de resolução de nomes)
-cat <<EOF > "/etc/adsys.yaml"
-ad_use_fully_qualified_names: false
-EOF
 
 rm -rf /var/cache/adsys/*
 adsysctl policy update --all -v
