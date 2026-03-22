@@ -168,7 +168,7 @@ else
     echo "Sufixo de domínio configurado."
 fi
 
-3. Garante que o use_fully_qualified_names esteja como True para o ADSys
+#3. Garante que o use_fully_qualified_names esteja como True para o ADSys
 sed -i "s/use_fully_qualified_names =.*/use_fully_qualified_names = True/g" /etc/sssd/sssd.conf
 
 systemctl restart sssd
