@@ -53,6 +53,12 @@ fi
 
 #----------------------- CONFIGURAÇÃO NETWORK-MANAGER ------------------------#
 # Necessário para evitar problemas de resolução de nomes ao ingressar no AD
+
+# Desinstalar systemd-resolved, se estiver presente, para evitar conflitos com o NetworkManager
+if dpkg -l | grep -q systemd-resolved; then
+    apt -y purge systemd-resolved
+    apt-mark hold systemd-resolved
+fi
 cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bkp
 cat <<EOF > "/etc/NetworkManager/NetworkManager.conf"
 [main]
@@ -106,6 +112,12 @@ SENHA=$(\
     3>&1 1>&2 2>&3 3>&- \
 )
 
+PASTA_COMPARTILHADA=$(\
+    dialog --no-cancel --title "Configuração de pasta compartilhada"\
+        --inputbox "Insira o caminho da pasta compartilhada no AD (ex: arquivos):" 8 60\
+    3>&1 1>&2 2>&3 3>&- \
+)   
+
 #-------------------------------- ALTERAR DNS --------------------------------#
 IFS=$'\n'
 
@@ -124,7 +136,7 @@ done
 
 #------------------------------ INGRESSAR NO AD ------------------------------#
 apt -y update
-apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
+apt -y install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit adsys krb5-user smbclient
 
 ### Comando original
 echo $SENHA | realm join --os-name $OS_NAME -U ${USUARIO} ${DOMINIO} >> /dev/null
@@ -168,5 +180,87 @@ EOF
 systemctl restart systemd-timesyncd.service
 timedatectl set-ntp false
 timedatectl set-ntp true
+
+cat <<EOF > "/usr/local/bin/sync_ad_files"
+#!/bin/bash
+
+#------------------------- CONFIGURAÇÕES -------------------------#
+DOMINIO="${DOMINIO}"
+SHARE="sysvol"
+REMOTE_DIR="/\${DOMINIO}/${PASTA_COMPARTILHADA}"
+LOCAL_DIR="/usr/share/ad_files/${PASTA_COMPARTILHADA}"
+
+# 1. Busca dinâmica de DCs ativos (registros SRV)
+# Isso garante que se um DC cair, o script tenta o próximo da lista
+DC_LIST=\$(host -t SRV _ldap._tcp.dc._msdcs.\${DOMINIO} | awk '{print \$NF}' | sed 's/\.\$//' | sort -u)
+
+# 2. Garante que a pasta local existe
+mkdir -p "\$LOCAL_DIR"
+
+# 3. Renova o ticket Kerberos da conta de máquina
+kinit -k \$(hostname)\\$
+
+# 4. Tenta sincronizar percorrendo a lista de DCs encontrados
+SUCESSO=false
+
+for DC in \$DC_LIST; do
+    echo "Tentando sincronizar com: \$DC"
+    if smbclient -k //\${DC}/\${SHARE} -c "prompt OFF; recurse ON; cd \${REMOTE_DIR}; lcd \${LOCAL_DIR}; mget *" > /dev/null 2>&1; then
+        echo "Sincronização concluída com sucesso via \$DC"
+        SUCESSO=true
+        break # Sai do loop assim que conseguir sincronizar com um DC
+    fi
+done
+
+if [ "\$SUCESSO" = false ]; then
+    echo "ERRO: Não foi possível sincronizar com nenhum Controlador de Domínio."
+    exit 1
+fi
+
+# 5. Ajusta permissões
+chmod -R 644 "\$LOCAL_DIR"
+find "\$LOCAL_DIR" -type d -exec chmod 755 {} +
+EOF
+
+# Tornar o script executável
+chmod +x /usr/local/bin/sync_ad_files
+
+cat <<EOF > "/etc/systemd/system/sync_ad_files.service"
+[Unit]
+Description=Sincronizacao de arquivos do AD Sysvol
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/local/bin/sync_ad_files
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat <<EOF > "/etc/systemd/system/sync_ad_files.timer"
+[Unit]
+Description=Agenda a sincronizacao de arquivos a cada 15 minutos
+
+[Timer]
+OnBootSec=5s
+OnUnitActiveSec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now sync_ad_files.timer
+
+cat <<EOF > "/etc/adsys.yaml"
+ad_use_fully_qualified_names: false
+EOF
+
+# Executar a sincronização inicial imediatamente
+sync_ad_files
+
 # Mensagem de sucesso
 dialog --no-cancel --msgbox "Bem-vindo ao domínio ${DOMINIO}!" 8 45
