@@ -187,39 +187,58 @@ cat <<EOF > "/usr/local/bin/sync_ad_files"
 #------------------------- CONFIGURAÇÕES -------------------------#
 DOMINIO="${DOMINIO}"
 SHARE="sysvol"
-REMOTE_DIR="/\${DOMINIO}/${PASTA_COMPARTILHADA}"
-LOCAL_DIR="/usr/share/ad_files/${PASTA_COMPARTILHADA}"
+PASTA_REMOTA="${PASTA_COMPARTILHADA}"
+MOUNTPOINT="/var/lib/samba/ad_temp_mount" 
+LOCAL_DIR="/usr/share/ad_files/\${PASTA_REMOTA}"
 
-# 1. Busca dinâmica de DCs ativos (registros SRV)
-# Isso garante que se um DC cair, o script tenta o próximo da lista
+# 1. Busca dinâmica de DCs ativos
 DC_LIST=\$(host -t SRV _ldap._tcp.dc._msdcs.\${DOMINIO} | awk '{print \$NF}' | sed 's/\.\$//' | sort -u)
 
-# 2. Garante que a pasta local existe
+# 2. Garante que as pastas existem
 mkdir -p "\$LOCAL_DIR"
+mkdir -p "\$MOUNTPOINT"
 
 # 3. Renova o ticket Kerberos da conta de máquina
 kinit -k \$(hostname)\\$
 
-# 4. Tenta sincronizar percorrendo a lista de DCs encontrados
+# 4. Tenta montar e sincronizar percorrendo a lista de DCs
 SUCESSO=false
 
 for DC in \$DC_LIST; do
-    echo "Tentando sincronizar com: \$DC"
-    if smbclient -k //\${DC}/\${SHARE} -c "prompt OFF; recurse ON; cd \${REMOTE_DIR}; lcd \${LOCAL_DIR}; mget *" > /dev/null 2>&1; then
-        echo "Sincronização concluída com sucesso via \$DC"
-        SUCESSO=true
-        break # Sai do loop assim que conseguir sincronizar com um DC
+    echo "Tentando conectar com: \$DC"
+    
+    # Tenta montar o SYSVOL via Kerberos (somente leitura - ro)
+    # Se a montagem falhar, o script pula para o próximo DC
+    if mount -t cifs //\${DC}/\${SHARE} \${MOUNTPOINT} -o sec=krb5,multiuser,ro,vers=3.0 2>/dev/null; then
+        echo "Montagem bem-sucedida via \$DC. Iniciando rsync..."
+        
+        # O rsync com --delete remove localmente apenas o que foi apagado no servidor
+        # A barra no final de SOURCE/ garante que sincronize o CONTEÚDO da pasta
+        SOURCE_PATH="\${MOUNTPOINT}/\${DOMINIO}/\${PASTA_REMOTA}/"
+        
+        if [ -d "\$SOURCE_PATH" ]; then
+            rsync -av --delete "\$SOURCE_PATH" "\$LOCAL_DIR/"
+            SUCESSO=true
+        else
+            echo "ERRO: Pasta \${PASTA_REMOTA} não encontrada no SYSVOL de \$DC"
+        fi
+        
+        # Desmonta imediatamente após o uso
+        umount -l \${MOUNTPOINT}
+        
+        [ "\$SUCESSO" = true ] && break
     fi
 done
 
 if [ "\$SUCESSO" = false ]; then
-    echo "ERRO: Não foi possível sincronizar com nenhum Controlador de Domínio."
+    echo "AVISO: Não foi possível sincronizar com nenhum DC. Mantendo arquivos locais atuais."
     exit 1
 fi
 
-# 5. Ajusta permissões
+# 5. Ajusta permissões finais
 chmod -R 644 "\$LOCAL_DIR"
 find "\$LOCAL_DIR" -type d -exec chmod 755 {} +
+echo "Sincronização concluída com sucesso."
 EOF
 
 # Tornar o script executável
