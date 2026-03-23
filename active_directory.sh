@@ -114,7 +114,7 @@ SENHA=$(\
 
 PASTA_COMPARTILHADA=$(\
     dialog --no-cancel --title "Configuração de pasta compartilhada"\
-        --inputbox "Insira o caminho da pasta compartilhada no AD (ex: arquivos):" 8 60\
+        --inputbox "Insira o caminho da pasta compartilhada dentro da pasta SYSVOL do AD:" 8 60\
     3>&1 1>&2 2>&3 3>&- \
 )   
 
@@ -202,8 +202,8 @@ cat <<EOF > "/usr/local/bin/sync_ad_files"
 DOMINIO="${DOMINIO}"
 SHARE="sysvol"
 PASTA_REMOTA="${PASTA_COMPARTILHADA}"
-MOUNTPOINT="/var/lib/samba/ad_temp_mount" 
-LOCAL_DIR="/usr/share/ad_files/\${PASTA_REMOTA}"
+MOUNTPOINT="/var/ad_temp_mount/\${DOMINIO}/\${PASTA_REMOTA}" 
+LOCAL_DIR="/var/ad_files/\${DOMINIO}/\${PASTA_REMOTA}"
 
 # 1. Busca dinâmica de DCs ativos
 DC_LIST=\$(host -t SRV _ldap._tcp.dc._msdcs.\${DOMINIO} | awk '{print \$NF}' | sed 's/\.\$//' | sort -u)
