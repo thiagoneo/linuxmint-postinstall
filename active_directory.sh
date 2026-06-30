@@ -171,6 +171,17 @@ fi
 # 3. Garante que o use_fully_qualified_names esteja como True para o ADSys
 sed -i "s/use_fully_qualified_names =.*/use_fully_qualified_names = True/g" /etc/sssd/sssd.conf
 
+# 4. Garante que o getpwuid()/NSS retorne apenas o nome curto (sem @dominio)
+# Necessario para compatibilidade com o CUPS a partir da versao 2.4.1op1-1ubuntu4.20
+# com default_domain_suffix ativo
+if grep -q "^full_name_format" /etc/sssd/sssd.conf; then
+    sed -i "s/^full_name_format =.*/full_name_format = %1\$s/" /etc/sssd/sssd.conf
+    echo "full_name_format atualizado para nome curto."
+else
+    sed -i "/^\[domain\/${DOMINIO}\]/a full_name_format = %1\$s" /etc/sssd/sssd.conf
+    echo "full_name_format configurado para nome curto."
+fi
+
 systemctl restart sssd
 
 # Configuração do systemd-timesyncd
